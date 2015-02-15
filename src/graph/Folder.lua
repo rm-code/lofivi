@@ -22,13 +22,20 @@
 
 local Folder = {};
 
-function Folder.new(name)
+function Folder.new(name, x, y)
     local self = {};
+
+    local px, py = x, y; -- Position vector.
 
     local files = {};
     local children = {};
 
     function self:draw()
+        love.graphics.rectangle('line', px, py, 10, 10);
+        love.graphics.print(name, px + 15, py + 15);
+        for _, node in pairs(children) do
+            node:draw();
+        end
     end
 
     function self:update(dt)
