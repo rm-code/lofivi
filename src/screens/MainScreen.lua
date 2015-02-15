@@ -21,6 +21,8 @@
 --==================================================================================================
 
 local Screen = require('lib/screenmanager/Screen');
+local Folder = require('src/graph/Folder');
+local File = require('src/graph/File');
 
 -- ------------------------------------------------
 -- Module
@@ -34,6 +36,68 @@ local MainScreen = {};
 
 function MainScreen.new()
     local self = Screen.new();
+
+    ---
+    -- Creates a file tree based on a sequence containing
+    -- paths to files and subfolders. Each folder is a folder
+    -- node which has children folder nodes and files.
+    -- @param paths
+    --
+    local function createFileTree(paths)
+        local tree = Folder.new('');
+
+        -- Iterate over each file path and recursively create
+        -- the tree structure for this path.
+        for i = 1, #paths do
+            local function recurse(path, target)
+                local b, e, f = path:find('/', 1);
+
+                if b and e then
+                    local folder = path:sub(1, b - 1);
+                    local target = target:getChild(folder); -- Create new folder or get existing one.
+                    recurse(path:sub(b + 1), target);
+                else
+                    target:addFile(path, File.new(path))
+                end
+            end
+
+            recurse(paths[i], tree);
+        end
+
+        return tree;
+    end
+
+    ---
+    -- Recursively iterates over the target directory and returns the
+    -- full path of all files and folders (including those in subfolders)
+    -- as a sequence.
+    -- @param dir
+    --
+    local function recursivelyGetDirectoryItems(dir)
+        local catalogue = {};
+
+        local function recurse(dir)
+            local items = love.filesystem.getDirectoryItems(dir);
+            for _, item in ipairs(items) do
+                local file = dir .. "/" .. item;
+                if love.filesystem.isDirectory(file) then
+                    recurse(file);
+                elseif love.filesystem.isFile(file) then
+                    catalogue[#catalogue + 1] = file;
+                end
+            end
+        end
+        -- Start recursion.
+        recurse(dir);
+
+        return catalogue;
+    end
+
+    function self:init()
+        local fileCatalogue = recursivelyGetDirectoryItems('root', '');
+
+        local tree = createFileTree(fileCatalogue);
+    end
 
     return self;
 end
