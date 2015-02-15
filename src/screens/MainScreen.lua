@@ -59,7 +59,7 @@ function MainScreen.new()
                     local target = target:getChild(folder) or target:addChild(folder, Folder.new(folder, love.math.random(20, 780), love.math.random(20, 580)));
                     recurse(path:sub(b + 1), target);
                 else
-                    target:addFile(path, File.new(path))
+                    target:addFile(path, File.new(path, target:getX() + love.math.random(-5, 5), target:getY() + love.math.random(-5, 5)));
                 end
             end
 
@@ -104,6 +104,10 @@ function MainScreen.new()
 
     function self:draw()
         tree:draw();
+    end
+
+    function self:update(dt)
+        tree:update(dt);
     end
 
     return self;

@@ -22,13 +22,52 @@
 
 local File = {};
 
-function File.new()
+function File.new(name, x, y)
     local self = {};
 
+    local px, py = x, y;
+    local vx, vy = 0, 0;
+    local ax, ay = 0, 0;
+
+    ---
+    -- Apply the calculated acceleration to the node.
+    --
+    local function move(dt)
+        vx = vx + ax;
+        vy = vy + ay;
+
+        px = px + vx;
+        py = py + vy;
+
+        ax, ay = 0, 0;
+    end
+
     function self:draw()
+        love.graphics.circle('line', px, py, 5, 5);
     end
 
     function self:update(dt)
+        move(dt);
+    end
+
+    function self:damp(f)
+        vx, vy = vx * f, vy * f;
+    end
+
+    function self:applyForce(fx, fy)
+        ax, ay = ax + fx, ay + fy;
+    end
+
+    function self:getX()
+        return px;
+    end
+
+    function self:getY()
+        return py;
+    end
+
+    function self:getMass()
+        return 0.01;
     end
 
     return self;
