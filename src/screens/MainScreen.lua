@@ -54,7 +54,7 @@ function MainScreen.new()
 
                 if b and e then
                     local folder = path:sub(1, b - 1);
-                    local target = target:getChild(folder); -- Create new folder or get existing one.
+                    local target = target:getChild(folder) or target:addChild(folder, Folder.new(folder));
                     recurse(path:sub(b + 1), target);
                 else
                     target:addFile(path, File.new(path))

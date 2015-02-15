@@ -39,9 +39,11 @@ function Folder.new(name)
     end
 
     function self:getChild(name)
-        if not children[name] then
-            children[name] = Folder.new(name);
-        end
+        return children[name];
+    end
+
+    function self:addChild(name, folder)
+        children[name] = folder;
         return children[name];
     end
 
