@@ -23,6 +23,7 @@
 local Screen = require('lib/screenmanager/Screen');
 local Folder = require('src/graph/Folder');
 local File = require('src/graph/File');
+local ExtensionHandler = require('src/graph/ExtensionHandler');
 
 -- ------------------------------------------------
 -- Module
@@ -59,7 +60,8 @@ function MainScreen.new()
                     local target = target:getChild(folder) or target:addChild(folder, Folder.new(target, folder, love.math.random(20, 780), love.math.random(20, 580)));
                     recurse(path:sub(b + 1), target);
                 else
-                    target:addFile(path, File.new(path, target:getX() + love.math.random(-5, 5), target:getY() + love.math.random(-5, 5)));
+                    local col = ExtensionHandler.add(path); -- Get a colour for this file.
+                    target:addFile(path, File.new(path, col, target:getX() + love.math.random(-5, 5), target:getY() + love.math.random(-5, 5)));
                 end
             end
 
@@ -103,6 +105,7 @@ function MainScreen.new()
     end
 
     function self:draw()
+        ExtensionHandler.draw();
         tree:draw();
     end
 
