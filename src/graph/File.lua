@@ -43,7 +43,9 @@ function File.new(name, x, y)
     end
 
     function self:draw()
+        love.graphics.setColor(255, 255, 255, 100);
         love.graphics.circle('line', px, py, 5, 20);
+        love.graphics.setColor(255, 255, 255, 255);
     end
 
     function self:update(dt)
