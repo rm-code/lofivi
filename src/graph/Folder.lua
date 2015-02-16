@@ -71,6 +71,9 @@ function Folder.new(name, x, y)
             file:draw();
         end
         for _, node in pairs(children) do
+            love.graphics.setColor(255, 255, 255, 35);
+            love.graphics.line(px, py, node:getX(), node:getY());
+            love.graphics.setColor(255, 255, 255, 255);
             node:draw();
         end
     end
