@@ -156,7 +156,7 @@ function Folder.new(parent, name, x, y)
     end
 
     function self:getMass()
-        return 0.01 * math.max(1, childCount) + 0.001 * math.max(1, fileCount);
+        return 0.01 * childCount + 0.001 * math.max(1, fileCount);
     end
 
     function self:getChildren()
