@@ -76,11 +76,11 @@ function Folder.new(name, x, y)
     function self:update(dt)
         for iA, fileA in pairs(files) do
             -- Attract files to their folder.
-            attract(fileA, px, py, -0.008);
+            attract(fileA, px, py, -0.001);
 
             for idB, fileB in pairs(files) do
                 if fileA ~= fileB then
-                    repulse(fileA, fileB, 800000);
+                    repulse(fileA, fileB, 80000);
                 end
             end
 
