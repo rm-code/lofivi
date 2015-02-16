@@ -63,7 +63,7 @@ function Folder.new(name, x, y)
     end
 
     function self:draw()
-        love.graphics.rectangle('line', px, py, 10, 10);
+        love.graphics.circle('fill', px, py, 2, 10);
         love.graphics.print(name, px + 15, py + 15);
         for _, file in pairs(files) do
             file:draw();
