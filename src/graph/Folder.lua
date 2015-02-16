@@ -84,7 +84,7 @@ function Folder.new(name, x, y)
                 end
             end
 
-            fileA:damp(0.1);
+            fileA:damp(0.9);
             fileA:update(dt);
         end
         for _, node in pairs(children) do
