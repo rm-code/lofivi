@@ -26,11 +26,26 @@ function Folder.new(parent, name, x, y)
     local self = {};
 
     local px, py = x, y; -- Position vector.
+    local vx, vy = 0, 0;
+    local ax, ay = 0, 0;
 
     local files = {};
     local fileCount = 0;
     local children = {};
     local childCount = 0;
+
+    ---
+    -- Apply the calculated acceleration to the node.
+    --
+    local function move(dt)
+        vx = vx + ax;
+        vy = vy + ay;
+
+        px = px + vx;
+        py = py + vy;
+
+        ax, ay = 0, 0;
+    end
 
     local function attract(file, x2, y2, spring)
         local dx, dy = file:getX() - x2, file:getY() - y2;
@@ -79,6 +94,7 @@ function Folder.new(parent, name, x, y)
     end
 
     function self:update(dt)
+        move(dt);
         for iA, fileA in pairs(files) do
             -- Attract files to their folder.
             attract(fileA, px, py, -0.001);
@@ -93,7 +109,16 @@ function Folder.new(parent, name, x, y)
             fileA:update(dt);
         end
         for _, node in pairs(children) do
+            -- Attract files to their folder.
+            attract(node, px, py, -0.001);
+            repulse(node, self, 1000000);
+            node:damp(0.95);
             node:update(dt);
+        end
+        if parent then
+            for _, sibling in pairs(parent:getChildren()) do
+                repulse(sibling, self, 1000000);
+            end
         end
     end
 
@@ -113,11 +138,23 @@ function Folder.new(parent, name, x, y)
     end
 
     function self:getX()
-        return x;
+        return px;
     end
 
     function self:getY()
-        return y;
+        return py;
+    end
+
+    function self:damp(f)
+        vx, vy = vx * f, vy * f;
+    end
+
+    function self:applyForce(fx, fy)
+        ax, ay = ax + fx, ay + fy;
+    end
+
+    function self:getMass()
+        return 0.01 * math.max(1, childCount) + 0.001 * math.max(1, fileCount);
     end
 
     function self:getChildren()
