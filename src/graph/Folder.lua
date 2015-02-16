@@ -120,6 +120,10 @@ function Folder.new(name, x, y)
         return y;
     end
 
+    function self:getChildren()
+        return children;
+    end
+
     return self;
 end
 
