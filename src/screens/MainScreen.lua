@@ -46,7 +46,7 @@ function MainScreen.new()
     -- @param paths
     --
     local function createFileTree(paths)
-        local tree = Folder.new('', love.graphics.getWidth() * 0.5, love.graphics.getHeight() * 0.5);
+        local tree = Folder.new(nil, '', love.graphics.getWidth() * 0.5, love.graphics.getHeight() * 0.5);
 
         -- Iterate over each file path and recursively create
         -- the tree structure for this path.
@@ -56,7 +56,7 @@ function MainScreen.new()
 
                 if b and e then
                     local folder = path:sub(1, b - 1);
-                    local target = target:getChild(folder) or target:addChild(folder, Folder.new(folder, love.math.random(20, 780), love.math.random(20, 580)));
+                    local target = target:getChild(folder) or target:addChild(folder, Folder.new(target, folder, love.math.random(20, 780), love.math.random(20, 580)));
                     recurse(path:sub(b + 1), target);
                 else
                     target:addFile(path, File.new(path, target:getX() + love.math.random(-5, 5), target:getY() + love.math.random(-5, 5)));

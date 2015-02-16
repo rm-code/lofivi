@@ -22,7 +22,7 @@
 
 local Folder = {};
 
-function Folder.new(name, x, y)
+function Folder.new(parent, name, x, y)
     local self = {};
 
     local px, py = x, y; -- Position vector.
