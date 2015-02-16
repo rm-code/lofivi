@@ -28,7 +28,9 @@ function Folder.new(name, x, y)
     local px, py = x, y; -- Position vector.
 
     local files = {};
+    local fileCount = 0;
     local children = {};
+    local childCount = 0;
 
     local function attract(file, x2, y2, spring)
         local dx, dy = file:getX() - x2, file:getY() - y2;
@@ -94,6 +96,7 @@ function Folder.new(name, x, y)
 
     function self:addFile(name, file)
         files[name] = file;
+        fileCount = fileCount + 1;
     end
 
     function self:getChild(name)
@@ -102,6 +105,7 @@ function Folder.new(name, x, y)
 
     function self:addChild(name, folder)
         children[name] = folder;
+        childCount = childCount + 1;
         return children[name];
     end
 
