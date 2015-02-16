@@ -81,7 +81,9 @@ function Folder.new(parent, name, x, y)
 
     function self:draw()
         love.graphics.circle('fill', px, py, 2, 10);
-        love.graphics.print(name, px + 15, py + 15);
+        love.graphics.setColor(255, 255, 255, 35);
+        love.graphics.print(name, px + 5, py + 5);
+        love.graphics.setColor(255, 255, 255, 255);
         for _, file in pairs(files) do
             file:draw();
         end
