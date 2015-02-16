@@ -43,7 +43,7 @@ function File.new(name, x, y)
     end
 
     function self:draw()
-        love.graphics.circle('line', px, py, 5, 5);
+        love.graphics.circle('line', px, py, 5, 20);
     end
 
     function self:update(dt)
