@@ -22,12 +22,20 @@
 
 local File = {};
 
+-- ------------------------------------------------
+-- Constructor
+-- ------------------------------------------------
+
 function File.new(name, color, x, y)
     local self = {};
 
     local px, py = x, y;
     local vx, vy = 0, 0;
     local ax, ay = 0, 0;
+
+    -- ------------------------------------------------
+    -- Private Functions
+    -- ------------------------------------------------
 
     ---
     -- Apply the calculated acceleration to the node.
@@ -41,6 +49,10 @@ function File.new(name, color, x, y)
 
         ax, ay = 0, 0;
     end
+
+    -- ------------------------------------------------
+    -- Public Functions
+    -- ------------------------------------------------
 
     function self:draw()
         love.graphics.setColor(color);
@@ -59,6 +71,10 @@ function File.new(name, color, x, y)
     function self:applyForce(fx, fy)
         ax, ay = ax + fx, ay + fy;
     end
+
+    -- ------------------------------------------------
+    -- Getters
+    -- ------------------------------------------------
 
     function self:getX()
         return px;

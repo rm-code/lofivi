@@ -22,6 +22,10 @@
 
 local Folder = {};
 
+-- ------------------------------------------------
+-- Constructor
+-- ------------------------------------------------
+
 function Folder.new(parent, name, x, y)
     local self = {};
 
@@ -33,6 +37,10 @@ function Folder.new(parent, name, x, y)
     local fileCount = 0;
     local children = {};
     local childCount = 0;
+
+    -- ------------------------------------------------
+    -- Private Functions
+    -- ------------------------------------------------
 
     ---
     -- Apply the calculated acceleration to the node.
@@ -78,6 +86,10 @@ function Folder.new(parent, name, x, y)
 
         fileA:applyForce(dx, dy);
     end
+
+    -- ------------------------------------------------
+    -- Public Functions
+    -- ------------------------------------------------
 
     function self:draw()
         love.graphics.circle('fill', px, py, 2, 10);
@@ -129,22 +141,10 @@ function Folder.new(parent, name, x, y)
         fileCount = fileCount + 1;
     end
 
-    function self:getChild(name)
-        return children[name];
-    end
-
     function self:addChild(name, folder)
         children[name] = folder;
         childCount = childCount + 1;
         return children[name];
-    end
-
-    function self:getX()
-        return px;
-    end
-
-    function self:getY()
-        return py;
     end
 
     function self:damp(f)
@@ -155,12 +155,28 @@ function Folder.new(parent, name, x, y)
         ax, ay = ax + fx, ay + fy;
     end
 
-    function self:getMass()
-        return 0.01 * childCount + 0.001 * math.max(1, fileCount);
+    -- ------------------------------------------------
+    -- Getters
+    -- ------------------------------------------------
+
+    function self:getChild(name)
+        return children[name];
     end
 
     function self:getChildren()
         return children;
+    end
+
+    function self:getX()
+        return px;
+    end
+
+    function self:getY()
+        return py;
+    end
+
+    function self:getMass()
+        return 0.01 * childCount + 0.001 * math.max(1, fileCount);
     end
 
     return self;

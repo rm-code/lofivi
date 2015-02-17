@@ -49,7 +49,7 @@ local function splitExtension(fileName)
 end
 
 -- ------------------------------------------------
--- Public Functions
+-- Global Functions
 -- ------------------------------------------------
 
 ---

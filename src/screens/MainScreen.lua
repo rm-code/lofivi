@@ -43,6 +43,10 @@ function MainScreen.new()
     local nodes;
     local tree;
 
+    -- ------------------------------------------------
+    -- Private Functions
+    -- ------------------------------------------------
+
     ---
     -- Creates a file tree based on a sequence containing
     -- paths to files and subfolders. Each folder is a folder
@@ -108,21 +112,6 @@ function MainScreen.new()
         return catalogue;
     end
 
-    function self:init()
-        camera = Camera.new();
-
-        local fileCatalogue = recursivelyGetDirectoryItems('root', '');
-
-        tree, nodes = createFileTree(fileCatalogue);
-    end
-
-    function self:draw()
-        ExtensionHandler.draw();
-        camera:set();
-        tree:draw();
-        camera:unset();
-    end
-
     local function getBoundaries(nodes)
         local minX = nodes[1]:getX();
         local maxX = nodes[1]:getX();
@@ -149,6 +138,25 @@ function MainScreen.new()
 
     local function getCenter(minX, maxX, minY, maxY)
         return minX + (maxX - minX) * 0.5, minY + (maxY - minY) * 0.5;
+    end
+
+    -- ------------------------------------------------
+    -- Public Functions
+    -- ------------------------------------------------
+
+    function self:init()
+        camera = Camera.new();
+
+        local fileCatalogue = recursivelyGetDirectoryItems('root', '');
+
+        tree, nodes = createFileTree(fileCatalogue);
+    end
+
+    function self:draw()
+        ExtensionHandler.draw();
+        camera:set();
+        tree:draw();
+        camera:unset();
     end
 
     function self:update(dt)
