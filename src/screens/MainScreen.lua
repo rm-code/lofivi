@@ -70,7 +70,6 @@ function MainScreen.new()
                     if not nTarget then
                         nodes[#nodes + 1] = Folder.new(target, folder, love.math.random(20, 780), love.math.random(20, 580));
                         nTarget = target:addChild(folder, nodes[#nodes]);
-                        print(#nodes)
                     end
                     recurse(path:sub(b + 1), nTarget);
                 else
