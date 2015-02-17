@@ -23,7 +23,7 @@
 local Screen = require('lib/screenmanager/Screen');
 local Folder = require('src/graph/Folder');
 local File = require('src/graph/File');
-local ExtensionHandler = require('src/graph/ExtensionHandler');
+local ExtensionHandler = require('src/ExtensionHandler');
 local Camera = require('src/Camera');
 
 -- ------------------------------------------------
