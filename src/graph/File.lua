@@ -20,74 +20,75 @@
 -- THE SOFTWARE.                                                                                   =
 --==================================================================================================
 
-local GAME_TITLE = "LoFiVi";
-
-local GAME_IDENTITY = "rmcode_LoFiVi";
-
-local GAME_VERSION = "0025";
-
-local LOVE_VERSION = "0.9.2";
+local File = {};
 
 -- ------------------------------------------------
--- Global Functions
+-- Constructor
 -- ------------------------------------------------
 
----
--- Initialise löve's config file.
--- @param _conf
---
-function love.conf(t)
-    t.identity = GAME_IDENTITY;
-    t.version = LOVE_VERSION;
-    t.console = true;
+function File.new(name, color, x, y)
+    local self = {};
 
-    t.window.title = GAME_TITLE;
-    t.window.icon = nil;
-    t.window.width = 0;
-    t.window.height = 0;
-    t.window.borderless = false;
-    t.window.resizable = true;
-    t.window.minwidth = 800;
-    t.window.minheight = 600;
-    t.window.fullscreen = false;
-    t.window.fullscreentype = "normal";
-    t.window.vsync = true;
-    t.window.fsaa = 0;
-    t.window.display = 1;
-    t.window.highdpi = false;
-    t.window.srgb = false;
-    t.window.x = nil;
-    t.window.y = nil;
+    local px, py = x, y;
+    local vx, vy = 0, 0;
+    local ax, ay = 0, 0;
 
-    t.modules.audio = true;
-    t.modules.event = true;
-    t.modules.graphics = true;
-    t.modules.image = true;
-    t.modules.joystick = true;
-    t.modules.keyboard = true;
-    t.modules.math = true;
-    t.modules.mouse = true;
-    t.modules.physics = true;
-    t.modules.sound = true;
-    t.modules.system = true;
-    t.modules.timer = true;
-    t.modules.window = true;
-end
+    -- ------------------------------------------------
+    -- Private Functions
+    -- ------------------------------------------------
 
----
--- Returns the game's version.
---
-function getVersion()
-    if GAME_VERSION then
-        return GAME_VERSION;
+    ---
+    -- Apply the calculated acceleration to the node.
+    --
+    local function move(dt)
+        vx = vx + ax;
+        vy = vy + ay;
+
+        px = px + vx;
+        py = py + vy;
+
+        ax, ay = 0, 0;
     end
+
+    -- ------------------------------------------------
+    -- Public Functions
+    -- ------------------------------------------------
+
+    function self:draw()
+        love.graphics.setColor(color);
+        love.graphics.circle('line', px, py, 5, 20);
+        love.graphics.setColor(255, 255, 255, 255);
+    end
+
+    function self:update(dt)
+        move(dt);
+    end
+
+    function self:damp(f)
+        vx, vy = vx * f, vy * f;
+    end
+
+    function self:applyForce(fx, fy)
+        ax, ay = ax + fx, ay + fy;
+    end
+
+    -- ------------------------------------------------
+    -- Getters
+    -- ------------------------------------------------
+
+    function self:getX()
+        return px;
+    end
+
+    function self:getY()
+        return py;
+    end
+
+    function self:getMass()
+        return 0.01;
+    end
+
+    return self;
 end
 
----
--- Returns the title.
---
-function getTitle()
-    if GAME_TITLE then
-        return GAME_TITLE;
-    end
-end
+return File;

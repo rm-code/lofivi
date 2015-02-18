@@ -20,74 +20,31 @@
 -- THE SOFTWARE.                                                                                   =
 --==================================================================================================
 
-local GAME_TITLE = "LoFiVi";
+local Camera = {};
 
-local GAME_IDENTITY = "rmcode_LoFiVi";
+function Camera.new()
+    local self = {};
 
-local GAME_VERSION = "0025";
+    local px, py = 0, 0;
+    local sx, sy = 1, 1;
 
-local LOVE_VERSION = "0.9.2";
-
--- ------------------------------------------------
--- Global Functions
--- ------------------------------------------------
-
----
--- Initialise löve's config file.
--- @param _conf
---
-function love.conf(t)
-    t.identity = GAME_IDENTITY;
-    t.version = LOVE_VERSION;
-    t.console = true;
-
-    t.window.title = GAME_TITLE;
-    t.window.icon = nil;
-    t.window.width = 0;
-    t.window.height = 0;
-    t.window.borderless = false;
-    t.window.resizable = true;
-    t.window.minwidth = 800;
-    t.window.minheight = 600;
-    t.window.fullscreen = false;
-    t.window.fullscreentype = "normal";
-    t.window.vsync = true;
-    t.window.fsaa = 0;
-    t.window.display = 1;
-    t.window.highdpi = false;
-    t.window.srgb = false;
-    t.window.x = nil;
-    t.window.y = nil;
-
-    t.modules.audio = true;
-    t.modules.event = true;
-    t.modules.graphics = true;
-    t.modules.image = true;
-    t.modules.joystick = true;
-    t.modules.keyboard = true;
-    t.modules.math = true;
-    t.modules.mouse = true;
-    t.modules.physics = true;
-    t.modules.sound = true;
-    t.modules.system = true;
-    t.modules.timer = true;
-    t.modules.window = true;
-end
-
----
--- Returns the game's version.
---
-function getVersion()
-    if GAME_VERSION then
-        return GAME_VERSION;
+    function self:set()
+        love.graphics.push();
+        love.graphics.scale(sx, sy);
+        love.graphics.translate(-px, -py);
+        love.graphics.translate(love.graphics.getWidth() / (2 * sx), love.graphics.getHeight() / (2 * sy));
     end
+
+    function self:unset()
+        love.graphics.pop();
+    end
+
+    function self:track(tarX, tarY, speed, dt)
+        px = px - (px - math.floor(tarX)) * dt * speed;
+        py = py - (py - math.floor(tarY)) * dt * speed;
+    end
+
+    return self;
 end
 
----
--- Returns the title.
---
-function getTitle()
-    if GAME_TITLE then
-        return GAME_TITLE;
-    end
-end
+return Camera;

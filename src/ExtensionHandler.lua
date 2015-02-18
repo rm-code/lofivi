@@ -1,5 +1,5 @@
 --==================================================================================================
--- Copyright (C) 2015 by Robert Machmer                                                            =
+-- Copyright (C) 2014 - 2015 by Robert Machmer                                                     =
 --                                                                                                 =
 -- Permission is hereby granted, free of charge, to any person obtaining a copy                    =
 -- of this software and associated documentation files (the "Software"), to deal                   =
@@ -20,74 +20,84 @@
 -- THE SOFTWARE.                                                                                   =
 --==================================================================================================
 
-local GAME_TITLE = "LoFiVi";
+local FileManager = {};
 
-local GAME_IDENTITY = "rmcode_LoFiVi";
+-- ------------------------------------------------
+-- Local Variables
+-- ------------------------------------------------
 
-local GAME_VERSION = "0025";
+local extensions = {};
+local totalFiles = 0;
 
-local LOVE_VERSION = "0.9.2";
+-- ------------------------------------------------
+-- Local Functions
+-- ------------------------------------------------
+
+---
+-- Splits the extension from a file.
+-- @param fileName
+--
+local function splitExtension(fileName)
+    local tmp = fileName:reverse();
+    local pos = tmp:find('%.');
+    if pos then
+        return tmp:sub(1, pos):reverse():lower();
+    else
+        -- Prevents issues with files sans extension.
+        return '.?';
+    end
+end
 
 -- ------------------------------------------------
 -- Global Functions
 -- ------------------------------------------------
 
 ---
--- Initialise löve's config file.
--- @param _conf
+-- Draws a list of all authors working on the project.
 --
-function love.conf(t)
-    t.identity = GAME_IDENTITY;
-    t.version = LOVE_VERSION;
-    t.console = true;
-
-    t.window.title = GAME_TITLE;
-    t.window.icon = nil;
-    t.window.width = 0;
-    t.window.height = 0;
-    t.window.borderless = false;
-    t.window.resizable = true;
-    t.window.minwidth = 800;
-    t.window.minheight = 600;
-    t.window.fullscreen = false;
-    t.window.fullscreentype = "normal";
-    t.window.vsync = true;
-    t.window.fsaa = 0;
-    t.window.display = 1;
-    t.window.highdpi = false;
-    t.window.srgb = false;
-    t.window.x = nil;
-    t.window.y = nil;
-
-    t.modules.audio = true;
-    t.modules.event = true;
-    t.modules.graphics = true;
-    t.modules.image = true;
-    t.modules.joystick = true;
-    t.modules.keyboard = true;
-    t.modules.math = true;
-    t.modules.mouse = true;
-    t.modules.physics = true;
-    t.modules.sound = true;
-    t.modules.system = true;
-    t.modules.timer = true;
-    t.modules.window = true;
-end
-
----
--- Returns the game's version.
---
-function getVersion()
-    if GAME_VERSION then
-        return GAME_VERSION;
+function FileManager.draw()
+    local count = 0;
+    love.graphics.print(totalFiles, love.graphics.getWidth() - 120, 20);
+    love.graphics.print('Files', love.graphics.getWidth() - 80, 20);
+    for ext, tbl in pairs(extensions) do
+        count = count + 1;
+        love.graphics.setColor(tbl.color);
+        love.graphics.print(ext, love.graphics.getWidth() - 80, 20 + count * 20);
+        love.graphics.print(tbl.amount, love.graphics.getWidth() - 120, 20 + count * 20);
+        love.graphics.setColor(255, 255, 255);
     end
 end
 
 ---
--- Returns the title.
+-- Adds a new file extension to the list.
+-- @param fileName
 --
-function getTitle()
-    if GAME_TITLE then
-        return GAME_TITLE;
+function FileManager.add(fileName)
+    local ext = splitExtension(fileName);
+    if not extensions[ext] then
+        extensions[ext] = {};
+        extensions[ext].amount = 0;
+        extensions[ext].color = { love.math.random(0, 255), love.math.random(0, 255), love.math.random(0, 255) };
     end
+    extensions[ext].amount = extensions[ext].amount + 1;
+    totalFiles = totalFiles + 1;
+
+    return extensions[ext].color;
 end
+
+-- ------------------------------------------------
+-- Getters
+-- ------------------------------------------------
+
+---
+-- @param ext
+--
+function FileManager.getColor(ext)
+    return extensions[ext].color;
+end
+
+-- ------------------------------------------------
+-- Return Module
+-- ------------------------------------------------
+
+return FileManager;
