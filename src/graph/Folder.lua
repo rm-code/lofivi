@@ -179,6 +179,10 @@ function Folder.new(parent, name, x, y)
         return 0.01 * childCount + 0.001 * math.max(1, fileCount);
     end
 
+    function self:getName()
+        return name;
+    end
+
     return self;
 end
 
