@@ -37,7 +37,9 @@ local MainScreen = {};
 -- ------------------------------------------------
 
 local WARNING_MESSAGE = [[
-To use LoFiVi you will have to place a folder structure you want to be visualised in the root folder of LoFiVi's save folder.
+To use LoFiVi you will have to place the folder structure you want to be visualised in the root folder of LoFiVi's save folder.
+
+After you have placed it there you can use the R-Key to regenerate the graph.
 
 LoFiVi will now open the file directory in which to place the folder.
 ]];
