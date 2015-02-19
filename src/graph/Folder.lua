@@ -55,8 +55,14 @@ function Folder.new(parent, name, x, y)
         ax, ay = 0, 0;
     end
 
-    local function attract(file, x2, y2, spring)
-        local dx, dy = file:getX() - x2, file:getY() - y2;
+    ---
+    -- Attracts nodeA towards nodeB based on a spring force.
+    -- @param nodeA
+    -- @param nodeB
+    -- @param spring
+    --
+    local function attract(nodeA, nodeB, spring)
+        local dx, dy = nodeA:getX() - nodeB:getX(), nodeA:getY() - nodeB:getY();
         local distance = math.sqrt(dx * dx + dy * dy);
         distance = math.max(0.001, math.min(distance, 100));
 
@@ -66,10 +72,16 @@ function Folder.new(parent, name, x, y)
 
         -- Calculate spring force and apply it.
         local force = spring * distance;
-        file:applyForce(dx * force, dy * force);
+        nodeA:applyForce(dx * force, dy * force);
     end
 
-    local function repulse(fileA, fileB, charge)
+    ---
+    -- Repels nodeA from nodeB.
+    -- @param fileA
+    -- @param fileB
+    -- @param charge
+    --
+    local function repel(fileA, fileB, charge)
         -- Calculate distance vector.
         local dx, dy = fileA:getX() - fileB:getX(), fileA:getY() - fileB:getY();
         local distance = math.sqrt(dx * dx + dy * dy);
@@ -108,32 +120,21 @@ function Folder.new(parent, name, x, y)
     end
 
     function self:update(dt)
-        move(dt);
         for iA, fileA in pairs(files) do
             -- Attract files to their folder.
-            attract(fileA, px, py, -0.008);
+            attract(fileA, self, -0.008);
 
             for idB, fileB in pairs(files) do
                 if fileA ~= fileB then
-                    repulse(fileA, fileB, 80000);
+                    repel(fileA, fileB, 80000);
                 end
             end
 
             fileA:damp(0.9);
             fileA:update(dt);
         end
-        for _, node in pairs(children) do
-            -- Attract files to their folder.
-            attract(node, px, py, -0.001);
-            repulse(node, self, 1000000);
-            node:damp(0.95);
-            node:update(dt);
-        end
-        if parent then
-            for _, sibling in pairs(parent:getChildren()) do
-                repulse(sibling, self, 1000000);
-            end
-        end
+
+        move(dt);
     end
 
     function self:addFile(name, file)
@@ -165,6 +166,17 @@ function Folder.new(parent, name, x, y)
 
     function self:getChildren()
         return children;
+    end
+
+    function self:isConnectedTo(node)
+        if parent == node then
+            return true;
+        end
+        for _, v in pairs(children) do
+            if node == v then
+                return true;
+            end
+        end
     end
 
     function self:getX()
