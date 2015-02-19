@@ -85,6 +85,11 @@ function FileManager.add(fileName)
     return extensions[ext].color;
 end
 
+function FileManager.reset()
+    extensions = {};
+    totalFiles = 0;
+end
+
 -- ------------------------------------------------
 -- Getters
 -- ------------------------------------------------

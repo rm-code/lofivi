@@ -123,6 +123,7 @@ function MainScreen.new()
 
     function self:keypressed(key)
         if key == 'r' then
+            ExtensionHandler.reset();
             local fileCatalogue = recursivelyGetDirectoryItems('root', '');
             graph:init(fileCatalogue);
         end
