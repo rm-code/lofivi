@@ -20,115 +20,118 @@
 -- THE SOFTWARE.                                                                                   =
 --==================================================================================================
 
-local Screen = require('lib/screenmanager/Screen');
+local Folder = require('src/graph/Folder');
+local File = require('src/graph/File');
 local ExtensionHandler = require('src/ExtensionHandler');
-local Graph = require('src/graph/Graph');
-local Camera = require('src/Camera');
 
 -- ------------------------------------------------
 -- Module
 -- ------------------------------------------------
 
-local MainScreen = {};
-
--- ------------------------------------------------
--- Constants
--- ------------------------------------------------
-
-local WARNING_MESSAGE = [[
-To use LoFiVi you will have to place the folder structure you want to be visualised in the root folder of LoFiVi's save folder.
-
-After you have placed it there you can use the R-Key to regenerate the graph.
-
-LoFiVi will now open the file directory in which to place the folder.
-]];
+local Graph = {};
 
 -- ------------------------------------------------
 -- Constructor
 -- ------------------------------------------------
 
-function MainScreen.new()
-    local self = Screen.new();
+function Graph.new()
+    local self = {};
 
-    local camera;
-    local graph;
+    local tree;
+    local nodes;
 
     -- ------------------------------------------------
     -- Private Functions
     -- ------------------------------------------------
 
     ---
-    -- Recursively iterates over the target directory and returns the
-    -- full path of all files and folders (including those in subfolders)
-    -- as a sequence.
-    -- @param dir
+    -- Creates a file tree based on a sequence containing
+    -- paths to files and subfolders. Each folder is a folder
+    -- node which has children folder nodes and files.
+    -- @param paths
     --
-    local function recursivelyGetDirectoryItems(dir)
-        local catalogue = {};
+    local function createGraph(paths)
+        local nodes = { Folder.new(nil, '', love.graphics.getWidth() * 0.5, love.graphics.getHeight() * 0.5) };
+        local tree = nodes[#nodes];
 
-        local function recurse(dir)
-            local items = love.filesystem.getDirectoryItems(dir);
-            for _, item in ipairs(items) do
-                local file = dir .. "/" .. item;
-                if love.filesystem.isDirectory(file) then
-                    recurse(file);
-                elseif love.filesystem.isFile(file) then
-                    catalogue[#catalogue + 1] = file;
+        -- Iterate over each file path and recursively create
+        -- the tree structure for this path.
+        for i = 1, #paths do
+            local function recurse(path, target)
+                local b, e, f = path:find('/', 1);
+
+                if b and e then
+                    local folder = path:sub(1, b - 1);
+                    local nTarget = target:getChild(folder);
+
+                    if not nTarget then
+                        nodes[#nodes + 1] = Folder.new(target, folder, love.math.random(20, 780), love.math.random(20, 580));
+                        nTarget = target:addChild(folder, nodes[#nodes]);
+                    end
+                    recurse(path:sub(b + 1), nTarget);
+                else
+                    local col = ExtensionHandler.add(path); -- Get a colour for this file.
+                    target:addFile(path, File.new(path, col, target:getX() + love.math.random(-5, 5), target:getY() + love.math.random(-5, 5)));
                 end
             end
+
+            recurse(paths[i], tree);
         end
 
-        -- Start recursion.
-        recurse(dir);
-
-        return catalogue;
-    end
-
-    local function setUpFolders()
-        if not love.filesystem.isDirectory('root') or #love.filesystem.getDirectoryItems('root') == 0 then
-            love.filesystem.createDirectory('root');
-            love.window.showMessageBox('No content found.', WARNING_MESSAGE, 'warning', false);
-            love.system.openURL('file://' .. love.filesystem.getSaveDirectory() .. '/root');
-        end
+        return tree, nodes;
     end
 
     -- ------------------------------------------------
     -- Public Functions
     -- ------------------------------------------------
 
-    function self:init()
-        camera = Camera.new();
-
-        setUpFolders();
-
-        local fileCatalogue = recursivelyGetDirectoryItems('root', '');
-
-        graph = Graph.new();
-        graph:init(fileCatalogue);
+    function self:init(paths)
+        tree, nodes = createGraph(paths);
     end
 
     function self:draw()
-        ExtensionHandler.draw();
-        camera:set();
-        graph:draw();
-        camera:unset();
+        tree:draw();
     end
 
     function self:update(dt)
-        graph:update(dt);
-
-        local cx, cy = graph:getCenter();
-        camera:track(cx, cy, 5, dt);
+        tree:update();
     end
 
-    function self:keypressed(key)
-        if key == 'r' then
-            local fileCatalogue = recursivelyGetDirectoryItems('root', '');
-            graph:init(fileCatalogue);
+    function self:getBoundaries(nodes)
+        local minX = nodes[1]:getX();
+        local maxX = nodes[1]:getX();
+        local minY = nodes[1]:getY();
+        local maxY = nodes[1]:getY();
+
+        for i = 2, #nodes do
+            local nx, ny = nodes[i]:getX(), nodes[i]:getY();
+
+            if not minX or nx < minX then
+                minX = nx;
+            elseif not maxX or nx > maxX then
+                maxX = nx;
+            end
+            if not minY or ny < minY then
+                minY = ny;
+            elseif not maxY or ny > maxY then
+                maxY = ny;
+            end
         end
+
+        return minX, maxX, minY, maxY;
+    end
+
+    function self:getCenter()
+        local minX, maxX, minY, maxY;
+        if nodes then
+            minX, maxX, minY, maxY = self:getBoundaries(nodes);
+        else
+            minX, maxX, minY, maxY = 0, 0, 0, 0;
+        end
+        return minX + (maxX - minX) * 0.5, minY + (maxY - minY) * 0.5;
     end
 
     return self;
 end
 
-return MainScreen;
+return Graph;
