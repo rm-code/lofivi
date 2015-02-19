@@ -167,7 +167,6 @@ function MainScreen.new()
         setUpFolders();
 
         local fileCatalogue = recursivelyGetDirectoryItems('root', '');
-
         tree, nodes = createFileTree(fileCatalogue);
     end
 
@@ -183,6 +182,13 @@ function MainScreen.new()
 
         local cx, cy = getCenter(getBoundaries(nodes));
         camera:track(cx, cy, 5, dt);
+    end
+
+    function self:keypressed(key)
+        if key == 'r' then
+            local fileCatalogue = recursivelyGetDirectoryItems('root', '');
+            tree, nodes = createFileTree(fileCatalogue);
+        end
     end
 
     return self;
