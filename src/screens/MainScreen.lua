@@ -33,6 +33,16 @@ local Camera = require('src/Camera');
 local MainScreen = {};
 
 -- ------------------------------------------------
+-- Constants
+-- ------------------------------------------------
+
+local WARNING_MESSAGE = [[
+To use LoFiVi you will have to place a folder structure you want to be visualised in the root folder of LoFiVi's save folder.
+
+LoFiVi will now open the file directory in which to place the folder.
+]];
+
+-- ------------------------------------------------
 -- Constructor
 -- ------------------------------------------------
 
@@ -139,12 +149,22 @@ function MainScreen.new()
         return minX + (maxX - minX) * 0.5, minY + (maxY - minY) * 0.5;
     end
 
+    local function setUpFolders()
+        if not love.filesystem.isDirectory('root') or #love.filesystem.getDirectoryItems('root') == 0 then
+            love.filesystem.createDirectory('root');
+            love.window.showMessageBox('No content found.', WARNING_MESSAGE, 'warning', false);
+            love.system.openURL('file://' .. love.filesystem.getSaveDirectory() .. '/root');
+        end
+    end
+
     -- ------------------------------------------------
     -- Public Functions
     -- ------------------------------------------------
 
     function self:init()
         camera = Camera.new();
+
+        setUpFolders();
 
         local fileCatalogue = recursivelyGetDirectoryItems('root', '');
 
