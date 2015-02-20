@@ -24,6 +24,7 @@ local Screen = require('lib/screenmanager/Screen');
 local ExtensionHandler = require('src/ExtensionHandler');
 local Graph = require('src/graph/Graph');
 local Camera = require('src/Camera');
+local ConfigReader = require('src/ConfigReader');
 
 -- ------------------------------------------------
 -- Module
@@ -51,6 +52,7 @@ function MainScreen.new()
     local self = Screen.new();
 
     local camera;
+    local config;
     local graph;
 
     -- ------------------------------------------------
@@ -92,16 +94,40 @@ function MainScreen.new()
         end
     end
 
+    local function ignoreFiles(paths, ignoreList)
+        local newList = {};
+        for _, path in ipairs(paths) do
+
+            -- Check if one of the patterns matches the path.
+            local ignore = false;
+            for _, pattern in ipairs(ignoreList) do
+                if path:match(pattern) then
+                    ignore = true;
+                    print('Ignore path: ' .. path);
+                end
+            end
+
+            -- Included the path into the new list if none of the patterns matched.
+            if not ignore then
+                newList[#newList + 1] = path;
+            end
+        end
+        return newList;
+    end
+
     -- ------------------------------------------------
     -- Public Functions
     -- ------------------------------------------------
 
     function self:init()
+        config = ConfigReader.init();
+
         camera = Camera.new();
 
         setUpFolders();
 
         local fileCatalogue = recursivelyGetDirectoryItems('root', '');
+        fileCatalogue = ignoreFiles(fileCatalogue, config.ignore);
 
         graph = Graph.new();
         graph:init(fileCatalogue);
