@@ -20,101 +20,113 @@
 -- THE SOFTWARE.                                                                                   =
 --==================================================================================================
 
-local Node = require('src/graph/Node');
-
--- ------------------------------------------------
--- Module
--- ------------------------------------------------
-
-local Folder = {};
+local Node = {};
 
 -- ------------------------------------------------
 -- Constructor
 -- ------------------------------------------------
 
-function Folder.new(parent, name, x, y)
-    local self = Node.new(name, x, y);
+function Node.new(name, x, y)
+    local self = {};
 
-    local files = {};
-    local fileCount = 0;
-    local children = {};
-    local childCount = 0;
+    local px, py = x, y; -- Position.
+    local vx, vy = 0, 0; -- Velocity.
+    local ax, ay = 0, 0; -- Acceleration.
 
     -- ------------------------------------------------
     -- Public Functions
     -- ------------------------------------------------
 
-    function self:draw()
-        love.graphics.circle('fill', self:getX(), self:getY(), 2, 10);
-        love.graphics.setColor(255, 255, 255, 35);
-        love.graphics.print(name, self:getX() + 5, self:getY() + 5);
-        love.graphics.setColor(255, 255, 255, 255);
-        for _, file in pairs(files) do
-            file:draw();
-        end
-        for _, node in pairs(children) do
-            love.graphics.setColor(255, 255, 255, 35);
-            love.graphics.line(self:getX(), self:getY(), node:getX(), node:getY());
-            love.graphics.setColor(255, 255, 255, 255);
-            node:draw();
-        end
-    end
-
     function self:update(dt)
-        for iA, fileA in pairs(files) do
-            -- Attract files to their folder.
-            fileA:attract(self, -0.008);
-
-            for idB, fileB in pairs(files) do
-                if fileA ~= fileB then
-                    fileA:repel(fileB, 80000);
-                end
-            end
-
-            fileA:damp(0.9);
-            fileA:move(dt);
-        end
+        return;
     end
 
-    function self:addFile(name, file)
-        files[name] = file;
-        fileCount = fileCount + 1;
+    function self:draw()
+        return;
     end
 
-    function self:addChild(name, folder)
-        children[name] = folder;
-        childCount = childCount + 1;
-        return children[name];
+    function self:damp(f)
+        vx, vy = vx * f, vy * f;
+    end
+
+    ---
+    -- Attracts the node towards nodeB based on a spring force.
+    -- @param nodeB
+    -- @param spring
+    --
+    function self:attract(nodeB, spring)
+        local dx, dy = self:getX() - nodeB:getX(), self:getY() - nodeB:getY();
+        local distance = math.sqrt(dx * dx + dy * dy);
+        distance = math.max(0.001, math.min(distance, 100));
+
+        -- Normalise vector.
+        dx = dx / distance;
+        dy = dy / distance;
+
+        -- Calculate spring force and apply it.
+        local force = spring * distance;
+        self:applyForce(dx * force, dy * force);
+    end
+
+    ---
+    -- Repels the node from nodeB.
+    -- @param fileB
+    -- @param charge
+    --
+    function self:repel(fileB, charge)
+        -- Calculate distance vector.
+        local dx, dy = self:getX() - fileB:getX(), self:getY() - fileB:getY();
+        local distance = math.sqrt(dx * dx + dy * dy);
+        distance = math.max(0.001, math.min(distance, 1000));
+
+        -- Normalise vector.
+        dx = dx / distance;
+        dy = dy / distance;
+
+        -- Calculate force's strength and apply it to the vector.
+        local strength = charge * ((self:getMass() * fileB:getMass()) / (distance * distance));
+        dx = dx * strength;
+        dy = dy * strength;
+
+        self:applyForce(dx, dy);
+    end
+
+    ---
+    -- @param fx
+    -- @param fy
+    --
+    function self:applyForce(fx, fy)
+        ax, ay = ax + fx, ay + fy;
+    end
+
+    ---
+    -- Apply the calculated acceleration to the node.
+    --
+    function self:move(dt)
+        vx = vx + ax;
+        vy = vy + ay;
+        px = px + vx;
+        py = py + vy;
+        ax, ay = 0, 0; -- Reset acceleration for the next update cycle.
     end
 
     -- ------------------------------------------------
     -- Getters
     -- ------------------------------------------------
 
-    function self:getChild(name)
-        return children[name];
+    function self:getX()
+        return px;
     end
 
-    function self:getChildren()
-        return children;
+    function self:getY()
+        return py;
     end
 
-    function self:isConnectedTo(node)
-        if parent == node then
-            return true;
-        end
-        for _, v in pairs(children) do
-            if node == v then
-                return true;
-            end
-        end
-    end
-
-    function self:getMass()
-        return 0.01 * childCount + 0.001 * math.max(1, fileCount);
+    function self:getName()
+        return name;
     end
 
     return self;
 end
 
-return Folder;
+return Node;

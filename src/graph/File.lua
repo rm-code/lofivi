@@ -20,6 +20,12 @@
 -- THE SOFTWARE.                                                                                   =
 --==================================================================================================
 
+local Node = require('src/graph/Node');
+
+-- ------------------------------------------------
+-- Module
+-- ------------------------------------------------
+
 local File = {};
 
 -- ------------------------------------------------
@@ -27,61 +33,12 @@ local File = {};
 -- ------------------------------------------------
 
 function File.new(name, color, x, y)
-    local self = {};
-
-    local px, py = x, y;
-    local vx, vy = 0, 0;
-    local ax, ay = 0, 0;
-
-    -- ------------------------------------------------
-    -- Private Functions
-    -- ------------------------------------------------
-
-    ---
-    -- Apply the calculated acceleration to the node.
-    --
-    local function move(dt)
-        vx = vx + ax;
-        vy = vy + ay;
-
-        px = px + vx;
-        py = py + vy;
-
-        ax, ay = 0, 0;
-    end
-
-    -- ------------------------------------------------
-    -- Public Functions
-    -- ------------------------------------------------
+    local self = Node.new(name, x, y);
 
     function self:draw()
         love.graphics.setColor(color);
-        love.graphics.circle('line', px, py, 5, 20);
+        love.graphics.circle('line', self:getX(), self:getY(), 5, 20);
         love.graphics.setColor(255, 255, 255, 255);
-    end
-
-    function self:update(dt)
-        move(dt);
-    end
-
-    function self:damp(f)
-        vx, vy = vx * f, vy * f;
-    end
-
-    function self:applyForce(fx, fy)
-        ax, ay = ax + fx, ay + fy;
-    end
-
-    -- ------------------------------------------------
-    -- Getters
-    -- ------------------------------------------------
-
-    function self:getX()
-        return px;
-    end
-
-    function self:getY()
-        return py;
     end
 
     function self:getMass()
