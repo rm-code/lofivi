@@ -162,6 +162,12 @@ function MainScreen.new()
     function self:update(dt)
         graph:update(dt);
 
+        if love.keyboard.isDown('+') then
+            camera:zoom(0.6, dt);
+        elseif love.keyboard.isDown('-') then
+            camera:zoom(-0.6, dt);
+        end
+
         local cx, cy = graph:getCenter();
         camera:track(cx, cy, 5, dt);
     end
