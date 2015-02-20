@@ -33,12 +33,39 @@ local File = {};
 -- ------------------------------------------------
 
 function File.new(name, color, x, y)
-    local self = Node.new(name, x, y);
+    local self = {};
+
+    local px, py = x, y;
+    local ox, oy = 0, 0;
+
+    -- ------------------------------------------------
+    -- Public Functions
+    -- ------------------------------------------------
 
     function self:draw()
         love.graphics.setColor(color);
-        love.graphics.circle('line', self:getX(), self:getY(), 5, 20);
+        love.graphics.circle('line', px + ox, py + oy, 5, 20);
         love.graphics.setColor(255, 255, 255, 255);
+    end
+
+    -- ------------------------------------------------
+    -- Setters
+    -- ------------------------------------------------
+
+    function self:setOffset(nox, noy)
+        ox, oy = nox, noy;
+    end
+
+    function self:setParentPosition(nx, ny)
+        px, py = nx, ny;
+    end
+
+    -- ------------------------------------------------
+    -- Getters
+    -- ------------------------------------------------
+
+    function self:getRealPosition()
+        return self:getX() + ox, self:getY() + oy;
     end
 
     function self:getMass()
