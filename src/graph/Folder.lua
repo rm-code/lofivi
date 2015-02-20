@@ -53,7 +53,7 @@ function Folder.new(parent, name, x, y)
             file:draw();
         end
         for _, node in pairs(children) do
-            love.graphics.setColor(255, 255, 255, 35);
+            love.graphics.setColor(255, 255, 255, 55);
             love.graphics.line(self:getX(), self:getY(), node:getX(), node:getY());
             love.graphics.setColor(255, 255, 255, 255);
             node:draw();
