@@ -10,10 +10,9 @@ LoFiVi mainly started as a test bed for LoGiVi. I wanted to be able to play arou
 
 LÖVE currently can only read files from LoFiVi's save directory ([according to](https://bitbucket.org/rude/love/issue/985/add-an-open-file-popup-dialog-function#comment-15482823) one of the developers this will be changed in Version 0.10.0 though).
 
-Find the save directory of LÖVE on your system (see the [LÖVE wiki](https://www.love2d.org/wiki/love.filesystem) for more information). Create a folder called ___rmcode_LoFiVi___ and inside of that folder create another folder called ___root___. 
+When you run LoFiVi for the first time it will set up the necessary folders for you and open them with your Finder / Explorer.
 
-Place the folder structure you want to visualise into the root folder and run LoFiVi.
-
+Now just place the folder structure you want to visualise into the root folder and re-run LoFiVi (or just press the R-Key if LoFiVi is still open).
 
 ### License
 Copyright (C) 2015 by Robert Machmer                                                       
@@ -22,10 +21,4 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR                 
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,                   
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE                
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER                     
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,              
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN                  
-THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

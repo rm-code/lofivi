@@ -20,116 +20,134 @@
 -- THE SOFTWARE.                                                                                   =
 --==================================================================================================
 
-local Screen = require('lib/screenmanager/Screen');
-local ExtensionHandler = require('src/ExtensionHandler');
-local Graph = require('src/graph/Graph');
-local Camera = require('src/Camera');
-
--- ------------------------------------------------
--- Module
--- ------------------------------------------------
-
-local MainScreen = {};
+local Node = {};
 
 -- ------------------------------------------------
 -- Constants
 -- ------------------------------------------------
 
-local WARNING_MESSAGE = [[
-To use LoFiVi you will have to place the folder structure you want to be visualised in the root folder of LoFiVi's save folder.
-
-After you have placed it there you can use the R-Key to regenerate the graph.
-
-LoFiVi will now open the file directory in which to place the folder.
-]];
+local FORCE_MAX = 4;
 
 -- ------------------------------------------------
 -- Constructor
 -- ------------------------------------------------
 
-function MainScreen.new()
-    local self = Screen.new();
+function Node.new(name, x, y)
+    local self = {};
 
-    local camera;
-    local graph;
+    local px, py = x, y; -- Position.
+    local vx, vy = 0, 0; -- Velocity.
+    local ax, ay = 0, 0; -- Acceleration.
 
     -- ------------------------------------------------
     -- Private Functions
     -- ------------------------------------------------
 
     ---
-    -- Recursively iterates over the target directory and returns the
-    -- full path of all files and folders (including those in subfolders)
-    -- as a sequence.
-    -- @param dir
+    -- Clamps a value to a certain range.
+    -- @param min
+    -- @param val
+    -- @param max
     --
-    local function recursivelyGetDirectoryItems(dir)
-        local catalogue = {};
-
-        local function recurse(dir)
-            local items = love.filesystem.getDirectoryItems(dir);
-            for _, item in ipairs(items) do
-                local file = dir .. "/" .. item;
-                if love.filesystem.isDirectory(file) then
-                    recurse(file);
-                elseif love.filesystem.isFile(file) then
-                    catalogue[#catalogue + 1] = file;
-                end
-            end
-        end
-
-        -- Start recursion.
-        recurse(dir);
-
-        return catalogue;
-    end
-
-    local function setUpFolders()
-        if not love.filesystem.isDirectory('root') or #love.filesystem.getDirectoryItems('root') == 0 then
-            love.filesystem.createDirectory('root');
-            love.window.showMessageBox('No content found.', WARNING_MESSAGE, 'warning', false);
-            love.system.openURL('file://' .. love.filesystem.getSaveDirectory() .. '/root');
-        end
+    local function clamp(min, val, max)
+        return math.max(min, math.min(val, max));
     end
 
     -- ------------------------------------------------
     -- Public Functions
     -- ------------------------------------------------
 
-    function self:init()
-        camera = Camera.new();
-
-        setUpFolders();
-
-        local fileCatalogue = recursivelyGetDirectoryItems('root', '');
-
-        graph = Graph.new();
-        graph:init(fileCatalogue);
+    function self:update(dt)
+        return;
     end
 
     function self:draw()
-        ExtensionHandler.draw();
-        camera:set();
-        graph:draw();
-        camera:unset();
+        return;
     end
 
-    function self:update(dt)
-        graph:update(dt);
-
-        local cx, cy = graph:getCenter();
-        camera:track(cx, cy, 5, dt);
+    function self:damp(f)
+        vx, vy = vx * f, vy * f;
     end
 
-    function self:keypressed(key)
-        if key == 'r' then
-            ExtensionHandler.reset();
-            local fileCatalogue = recursivelyGetDirectoryItems('root', '');
-            graph:init(fileCatalogue);
-        end
+    ---
+    -- Attracts the node towards nodeB based on a spring force.
+    -- @param nodeB
+    -- @param spring
+    --
+    function self:attract(nodeB, spring)
+        local dx, dy = self:getX() - nodeB:getX(), self:getY() - nodeB:getY();
+        local distance = math.sqrt(dx * dx + dy * dy);
+        distance = math.max(0.001, math.min(distance, 100));
+
+        -- Normalise vector.
+        dx = dx / distance;
+        dy = dy / distance;
+
+        -- Calculate spring force and apply it.
+        local force = spring * distance;
+        self:applyForce(dx * force, dy * force);
+    end
+
+    ---
+    -- Repels the node from nodeB.
+    -- @param fileB
+    -- @param charge
+    --
+    function self:repel(fileB, charge)
+        -- Calculate distance vector.
+        local dx, dy = self:getX() - fileB:getX(), self:getY() - fileB:getY();
+        local distance = math.sqrt(dx * dx + dy * dy);
+        distance = math.max(0.001, math.min(distance, 1000));
+
+        -- Normalise vector.
+        dx = dx / distance;
+        dy = dy / distance;
+
+        -- Calculate force's strength and apply it to the vector.
+        local strength = charge * ((self:getMass() * fileB:getMass()) / (distance * distance));
+        dx = dx * strength;
+        dy = dy * strength;
+
+        self:applyForce(dx, dy);
+    end
+
+    ---
+    -- @param fx
+    -- @param fy
+    --
+    function self:applyForce(fx, fy)
+        ax = clamp(-FORCE_MAX, ax + fx, FORCE_MAX);
+        ay = clamp(-FORCE_MAX, ay + fy, FORCE_MAX);
+    end
+
+    ---
+    -- Apply the calculated acceleration to the node.
+    --
+    function self:move(dt)
+        vx = vx + ax;
+        vy = vy + ay;
+        px = px + vx;
+        py = py + vy;
+        ax, ay = 0, 0; -- Reset acceleration for the next update cycle.
+    end
+
+    -- ------------------------------------------------
+    -- Getters
+    -- ------------------------------------------------
+
+    function self:getX()
+        return px;
+    end
+
+    function self:getY()
+        return py;
+    end
+
+    function self:getName()
+        return name;
     end
 
     return self;
 end
 
-return MainScreen;
+return Node;
