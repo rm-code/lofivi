@@ -23,6 +23,12 @@
 local Node = {};
 
 -- ------------------------------------------------
+-- Constants
+-- ------------------------------------------------
+
+local FORCE_MAX = 4;
+
+-- ------------------------------------------------
 -- Constructor
 -- ------------------------------------------------
 
@@ -32,6 +38,20 @@ function Node.new(name, x, y)
     local px, py = x, y; -- Position.
     local vx, vy = 0, 0; -- Velocity.
     local ax, ay = 0, 0; -- Acceleration.
+
+    -- ------------------------------------------------
+    -- Private Functions
+    -- ------------------------------------------------
+
+    ---
+    -- Clamps a value to a certain range.
+    -- @param min
+    -- @param val
+    -- @param max
+    --
+    local function clamp(min, val, max)
+        return math.max(min, math.min(val, max));
+    end
 
     -- ------------------------------------------------
     -- Public Functions
@@ -96,7 +116,8 @@ function Node.new(name, x, y)
     -- @param fy
     --
     function self:applyForce(fx, fy)
-        ax, ay = ax + fx, ay + fy;
+        ax = clamp(-FORCE_MAX, ax + fx, FORCE_MAX);
+        ay = clamp(-FORCE_MAX, ay + fy, FORCE_MAX);
     end
 
     ---
