@@ -35,6 +35,7 @@ local FORCE_MAX = 4;
 function Node.new(name, x, y)
     local self = {};
 
+    local speed = 16;
     local px, py = x, y; -- Position.
     local vx, vy = 0, 0; -- Velocity.
     local ax, ay = 0, 0; -- Acceleration.
@@ -122,8 +123,8 @@ function Node.new(name, x, y)
     -- Apply the calculated acceleration to the node.
     --
     function self:move(dt)
-        vx = vx + ax;
-        vy = vy + ay;
+        vx = vx + ax * dt * speed;
+        vy = vy + ay * dt * speed;
         px = px + vx;
         py = py + vy;
         ax, ay = 0, 0; -- Reset acceleration for the next update cycle.
