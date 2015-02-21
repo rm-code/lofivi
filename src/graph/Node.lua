@@ -77,7 +77,6 @@ function Node.new(name, x, y)
     function self:attract(nodeB, spring)
         local dx, dy = self:getX() - nodeB:getX(), self:getY() - nodeB:getY();
         local distance = math.sqrt(dx * dx + dy * dy);
-        distance = math.max(0.001, math.min(distance, 100));
 
         -- Normalise vector.
         dx = dx / distance;
@@ -97,7 +96,6 @@ function Node.new(name, x, y)
         -- Calculate distance vector.
         local dx, dy = self:getX() - fileB:getX(), self:getY() - fileB:getY();
         local distance = math.sqrt(dx * dx + dy * dy);
-        distance = math.max(0.001, math.min(distance, 1000));
 
         -- Normalise vector.
         dx = dx / distance;
