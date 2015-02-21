@@ -65,7 +65,11 @@ function Graph.new()
                     local nTarget = target:getChild(folder);
 
                     if not nTarget then
-                        nodes[#nodes + 1] = Folder.new(target, folder, love.math.random(20, 780), love.math.random(20, 580));
+                        -- Calculate random offset at which to place the new folder node.
+                        local ox = love.math.random(5, 40) * (love.math.random(0, 1) == 0 and -1 or 1);
+                        local oy = love.math.random(5, 40) * (love.math.random(0, 1) == 0 and -1 or 1);
+
+                        nodes[#nodes + 1] = Folder.new(target, folder, target:getX() + ox, target:getY() + oy);
                         nTarget = target:addChild(folder, nodes[#nodes]);
                     end
                     recurse(path:sub(b + 1), nTarget);
