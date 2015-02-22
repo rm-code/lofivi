@@ -33,6 +33,9 @@ local FILE_TEMPLATE = [[
 -- ------------------------------- --
 
 return {
+    options = {
+        bgColor = { 0, 0, 0 },
+    },
     -- You can use lua patterns or simple string matching to ignore
     -- certain files and folders when creating a graph.
     ignore = {

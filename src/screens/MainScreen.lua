@@ -121,6 +121,7 @@ function MainScreen.new()
 
     function self:init()
         config = ConfigReader.init();
+        love.graphics.setBackgroundColor(config.options.bgColor);
 
         camera = Camera.new();
 
