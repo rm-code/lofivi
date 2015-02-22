@@ -35,7 +35,7 @@ local FORCE_MAX = 4;
 function Node.new(name, x, y)
     local self = {};
 
-    local speed = 16;
+    local speed = 64;
     local px, py = x, y; -- Position.
     local vx, vy = 0, 0; -- Velocity.
     local ax, ay = 0, 0; -- Acceleration.
