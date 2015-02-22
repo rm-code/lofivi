@@ -43,6 +43,7 @@ After you have placed it there you can use the R-Key to regenerate the graph.
 
 LoFiVi will now open the file directory in which to place the folder.
 ]];
+local CAMERA_SPEED = 400;
 
 -- ------------------------------------------------
 -- Constructor
@@ -54,6 +55,8 @@ function MainScreen.new()
     local camera;
     local config;
     local graph;
+    local cx, cy;
+    local ox, oy;
 
     -- ------------------------------------------------
     -- Private Functions
@@ -153,6 +156,8 @@ function MainScreen.new()
 
         -- Create the camera.
         camera = Camera.new();
+        cx, cy = 0, 0; -- Camera tracking position.
+        ox, oy = 0, 0; -- Camera offset.
 
         -- Read the files and folders and checks if some of them will be ignored.
         local pathsList = recursivelyGetDirectoryItems('root', '');
@@ -178,9 +183,19 @@ function MainScreen.new()
         elseif love.keyboard.isDown('-') then
             camera:zoom(-0.6, dt);
         end
+        if love.keyboard.isDown('up') then
+            oy = oy - dt * CAMERA_SPEED;
+        elseif love.keyboard.isDown('down') then
+            oy = oy + dt * CAMERA_SPEED;
+        end
+        if love.keyboard.isDown('left') then
+            ox = ox - dt * CAMERA_SPEED;
+        elseif love.keyboard.isDown('right') then
+            ox = ox + dt * CAMERA_SPEED;
+        end
 
-        local cx, cy = graph:getCenter();
-        camera:track(cx, cy, 5, dt);
+        cx, cy = graph:getCenter();
+        camera:track(cx + ox, cy + oy, 2, dt);
     end
 
     function self:keypressed(key)
