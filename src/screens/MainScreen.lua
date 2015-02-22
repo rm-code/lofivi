@@ -66,7 +66,7 @@ function MainScreen.new()
     -- @param dir
     --
     local function recursivelyGetDirectoryItems(dir)
-        local catalogue = {};
+        local pathsList = {};
 
         local function recurse(dir)
             local items = love.filesystem.getDirectoryItems(dir);
@@ -75,7 +75,7 @@ function MainScreen.new()
                 if love.filesystem.isDirectory(file) then
                     recurse(file);
                 elseif love.filesystem.isFile(file) then
-                    catalogue[#catalogue + 1] = file;
+                    pathsList[#pathsList + 1] = file;
                 end
             end
         end
@@ -83,9 +83,14 @@ function MainScreen.new()
         -- Start recursion.
         recurse(dir);
 
-        return catalogue;
+        return pathsList;
     end
 
+    ---
+    -- Creates the necessary folders if they don't exist yet, shows a
+    -- message box to the user and opens the root folder in a
+    -- finder / explorer window.
+    --
     local function setUpFolders()
         if not love.filesystem.isDirectory('root') or #love.filesystem.getDirectoryItems('root') == 0 then
             love.filesystem.createDirectory('root');
@@ -94,6 +99,13 @@ function MainScreen.new()
         end
     end
 
+    ---
+    -- This function goes over the list of file and folder paths and
+    -- checks if a path should be ignored based on the custom ignore list
+    -- read from the config file.
+    -- @param paths
+    -- @param ignoreList
+    --
     local function ignoreFiles(paths, ignoreList)
         local newList = {};
         for _, path in ipairs(paths) do
@@ -120,19 +132,24 @@ function MainScreen.new()
     -- ------------------------------------------------
 
     function self:init()
+        -- Set up the necessary folders.
+        setUpFolders();
+
+        -- Load configuration file and set options.
         config = ConfigReader.init();
         love.graphics.setBackgroundColor(config.options.bgColor);
         ExtensionHandler.setColorTable(config.fileColors);
 
+        -- Create the camera.
         camera = Camera.new();
 
-        setUpFolders();
+        -- Read the files and folders and checks if some of them will be ignored.
+        local pathsList = recursivelyGetDirectoryItems('root', '');
+        pathsList = ignoreFiles(pathsList, config.ignore);
 
-        local fileCatalogue = recursivelyGetDirectoryItems('root', '');
-        fileCatalogue = ignoreFiles(fileCatalogue, config.ignore);
-
+        -- Create a graph using the edited list of files and folders.
         graph = Graph.new();
-        graph:init(fileCatalogue);
+        graph:init(pathsList);
     end
 
     function self:draw()
