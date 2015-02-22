@@ -127,6 +127,17 @@ function MainScreen.new()
         return newList;
     end
 
+    ---
+    -- Grabs a screenshot and stores as a png-file using a unix
+    -- timestap as a name. It will also set up a 'screenshots' folder
+    -- in LoFiVi's save directory if it doesn't exist yet.
+    --
+    local function createScreenshot()
+        local screenshot = love.graphics.newScreenshot();
+        love.filesystem.createDirectory('screenshots');
+        screenshot:encode('screenshots/' .. os.time() .. '.png');
+    end
+
     -- ------------------------------------------------
     -- Public Functions
     -- ------------------------------------------------
@@ -177,6 +188,8 @@ function MainScreen.new()
             ExtensionHandler.reset();
             local fileCatalogue = recursivelyGetDirectoryItems('root', '');
             graph:init(fileCatalogue);
+        elseif key == 's' then
+            createScreenshot();
         end
     end
 
