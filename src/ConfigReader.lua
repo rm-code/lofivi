@@ -36,6 +36,12 @@ return {
     options = {
         bgColor = { 0, 0, 0 },
     },
+
+    -- Can be used to assign a specific color to a file extension (RGB or RGBA).
+    fileColors = {
+        -- ['.example'] = { 255, 0, 0, 255 },
+    },
+
     -- You can use lua patterns or simple string matching to ignore
     -- certain files and folders when creating a graph.
     ignore = {
