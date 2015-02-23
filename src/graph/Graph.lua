@@ -78,7 +78,7 @@ function Graph.new()
                     target = nodes[1];
                 elseif name:find('%.') then
                     local col = ExtensionHandler.add(name); -- Get a colour for this file.
-                    target:addFile(name, File.new(name, col, target:getX() + love.math.random(-5, 5), target:getY() + love.math.random(-5, 5)));
+                    target:addFile(name, File.new(name, col));
                 else
                     -- Get the next folder as a target. If that folder doesn't exist in our graph yet, create it first.
                     local nt = target:getChild(name);

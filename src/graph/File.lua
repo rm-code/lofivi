@@ -26,11 +26,11 @@ local File = {};
 -- Constructor
 -- ------------------------------------------------
 
-function File.new(name, color, x, y)
+function File.new(name, color)
     local self = {};
 
-    local px, py = x, y;
-    local ox, oy = 0, 0;
+    local px, py;
+    local ox, oy;
 
     -- ------------------------------------------------
     -- Public Functions
@@ -52,18 +52,6 @@ function File.new(name, color, x, y)
 
     function self:setParentPosition(nx, ny)
         px, py = nx, ny;
-    end
-
-    -- ------------------------------------------------
-    -- Getters
-    -- ------------------------------------------------
-
-    function self:getRealPosition()
-        return self:getX() + ox, self:getY() + oy;
-    end
-
-    function self:getMass()
-        return 0.01;
     end
 
     return self;
