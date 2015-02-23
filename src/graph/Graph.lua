@@ -39,10 +39,25 @@ function Graph.new()
 
     local tree;
     local nodes;
+    local minX, maxX, minY, maxY;
 
     -- ------------------------------------------------
     -- Private Functions
     -- ------------------------------------------------
+
+    local function updateBoundaries(minX, maxX, minY, maxY, nx, ny)
+        if nx < minX then
+            minX = nx;
+        elseif nx > maxX then
+            maxX = nx;
+        end
+        if ny < minY then
+            minY = ny;
+        elseif ny > maxY then
+            maxY = ny;
+        end
+        return minX, maxX, minY, maxY;
+    end
 
     ---
     -- Creates a file tree based on a sequence containing
@@ -91,6 +106,7 @@ function Graph.new()
 
     function self:init(paths)
         tree, nodes = createGraph(paths);
+        minX, minY, maxX, maxY = tree:getX(), tree:getX(), tree:getY(), tree:getY();
     end
 
     function self:draw()
@@ -112,41 +128,12 @@ function Graph.new()
 
             nodeA:damp(0.95);
             nodeA:update(dt);
-            nodeA:move(dt);
+            local nx, ny = nodeA:move(dt);
+            minX, maxX, minY, maxY = updateBoundaries(minX, maxX, minY, maxY, nx, ny);
         end
-    end
-
-    function self:getBoundaries(nodes)
-        local minX = nodes[1]:getX();
-        local maxX = nodes[1]:getX();
-        local minY = nodes[1]:getY();
-        local maxY = nodes[1]:getY();
-
-        for i = 2, #nodes do
-            local nx, ny = nodes[i]:getX(), nodes[i]:getY();
-
-            if not minX or nx < minX then
-                minX = nx;
-            elseif not maxX or nx > maxX then
-                maxX = nx;
-            end
-            if not minY or ny < minY then
-                minY = ny;
-            elseif not maxY or ny > maxY then
-                maxY = ny;
-            end
-        end
-
-        return minX, maxX, minY, maxY;
     end
 
     function self:getCenter()
-        local minX, maxX, minY, maxY;
-        if nodes then
-            minX, maxX, minY, maxY = self:getBoundaries(nodes);
-        else
-            minX, maxX, minY, maxY = 0, 0, 0, 0;
-        end
         return minX + (maxX - minX) * 0.5, minY + (maxY - minY) * 0.5;
     end
 

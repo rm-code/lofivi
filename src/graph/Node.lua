@@ -128,6 +128,7 @@ function Node.new(name, x, y)
         px = px + vx;
         py = py + vy;
         ax, ay = 0, 0; -- Reset acceleration for the next update cycle.
+        return px, py;
     end
 
     -- ------------------------------------------------
