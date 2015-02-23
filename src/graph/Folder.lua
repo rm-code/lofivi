@@ -20,29 +20,44 @@
 -- THE SOFTWARE.                                                                                   =
 --==================================================================================================
 
-local Node = require('src/graph/Node');
-
--- ------------------------------------------------
--- Module
--- ------------------------------------------------
-
 local Folder = {};
+
+-- ------------------------------------------------
+-- Constants
+-- ------------------------------------------------
+
+local FORCE_MAX = 4;
 
 -- ------------------------------------------------
 -- Constructor
 -- ------------------------------------------------
 
 function Folder.new(parent, name, x, y)
-    local self = Node.new(name, x, y);
+    local self = {};
 
     local files = {};
     local fileCount = 0;
     local children = {};
     local childCount = 0;
 
+    local speed = 64;
+    local px, py = x, y; -- Position.
+    local vx, vy = 0, 0; -- Velocity.
+    local ax, ay = 0, 0; -- Acceleration.
+
     -- ------------------------------------------------
     -- Private Functions
     -- ------------------------------------------------
+
+    ---
+    -- Clamps a value to a certain range.
+    -- @param min
+    -- @param val
+    -- @param max
+    --
+    local function clamp(min, val, max)
+        return math.max(min, math.min(val, max));
+    end
 
     ---
     -- Calculates the arc for a certain angle.
@@ -126,16 +141,16 @@ function Folder.new(parent, name, x, y)
     -- ------------------------------------------------
 
     function self:draw()
-        love.graphics.circle('fill', self:getX(), self:getY(), 2, 10);
+        love.graphics.circle('fill', px, py, 2, 10);
         love.graphics.setColor(255, 255, 255, 35);
-        love.graphics.print(name, self:getX() + 5, self:getY() + 5);
+        love.graphics.print(name, px + 5, py + 5);
         love.graphics.setColor(255, 255, 255, 255);
         for _, file in pairs(files) do
             file:draw();
         end
         for _, node in pairs(children) do
             love.graphics.setColor(255, 255, 255, 55);
-            love.graphics.line(self:getX(), self:getY(), node:getX(), node:getY());
+            love.graphics.line(px, py, node:getX(), node:getY());
             love.graphics.setColor(255, 255, 255, 255);
             node:draw();
         end
@@ -143,7 +158,7 @@ function Folder.new(parent, name, x, y)
 
     function self:update(dt)
         for _, file in pairs(files) do
-            file:setParentPosition(self:getX(), self:getY());
+            file:setParentPosition(px, py);
         end
     end
 
@@ -159,9 +174,86 @@ function Folder.new(parent, name, x, y)
         return children[name];
     end
 
+    ---
+    -- Add a damping factor.
+    -- @param f
+    --
+    function self:damp(f)
+        vx, vy = vx * f, vy * f;
+    end
+
+    ---
+    -- Attracts the node towards nodeB based on a spring force.
+    -- @param nodeB
+    -- @param spring
+    --
+    function self:attract(nodeB, spring)
+        local dx, dy = self:getX() - nodeB:getX(), self:getY() - nodeB:getY();
+        local distance = math.sqrt(dx * dx + dy * dy);
+
+        -- Normalise vector.
+        dx = dx / distance;
+        dy = dy / distance;
+
+        -- Calculate spring force and apply it.
+        local force = spring * distance;
+        self:applyForce(dx * force, dy * force);
+    end
+
+    ---
+    -- Repels the node from nodeB.
+    -- @param fileB
+    -- @param charge
+    --
+    function self:repel(fileB, charge)
+        -- Calculate distance vector.
+        local dx, dy = self:getX() - fileB:getX(), self:getY() - fileB:getY();
+        local distance = math.sqrt(dx * dx + dy * dy);
+
+        -- Normalise vector.
+        dx = dx / distance;
+        dy = dy / distance;
+
+        -- Calculate force's strength and apply it to the vector.
+        local strength = charge * ((self:getMass() * fileB:getMass()) / (distance * distance));
+        dx = dx * strength;
+        dy = dy * strength;
+
+        self:applyForce(dx, dy);
+    end
+
+    ---
+    -- @param fx
+    -- @param fy
+    --
+    function self:applyForce(fx, fy)
+        ax = clamp(-FORCE_MAX, ax + fx, FORCE_MAX);
+        ay = clamp(-FORCE_MAX, ay + fy, FORCE_MAX);
+    end
+
+    ---
+    -- Apply the calculated acceleration to the node.
+    --
+    function self:move(dt)
+        vx = vx + ax * dt * speed;
+        vy = vy + ay * dt * speed;
+        px = px + vx;
+        py = py + vy;
+        ax, ay = 0, 0; -- Reset acceleration for the next update cycle.
+        return px, py;
+    end
+
     -- ------------------------------------------------
     -- Getters
     -- ------------------------------------------------
+
+    function self:getX()
+        return px;
+    end
+
+    function self:getY()
+        return py;
+    end
 
     function self:getChild(name)
         return children[name];
