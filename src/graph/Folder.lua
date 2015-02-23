@@ -259,10 +259,6 @@ function Folder.new(parent, name, x, y)
         return children[name];
     end
 
-    function self:getChildren()
-        return children;
-    end
-
     function self:isConnectedTo(node)
         if parent == node then
             return true;
