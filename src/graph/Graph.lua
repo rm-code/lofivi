@@ -66,35 +66,34 @@ function Graph.new()
     -- @param paths
     --
     local function createGraph(paths)
-        local nodes = { Folder.new(nil, '', love.graphics.getWidth() * 0.5, love.graphics.getHeight() * 0.5) };
+        local nodes = { Folder.new(nil, 'root', love.graphics.getWidth() * 0.5, love.graphics.getHeight() * 0.5) };
         local tree = nodes[#nodes];
 
-        -- Iterate over each file path and recursively create
-        -- the tree structure for this path.
         for i = 1, #paths do
-            local function recurse(path, target)
-                local b, e, f = path:find('/', 1);
+            local target;
 
-                if b and e then
-                    local folder = path:sub(1, b - 1);
-                    local nTarget = target:getChild(folder);
-
-                    if not nTarget then
+            -- Split the path using pattern matching.
+            for name in paths[i]:gmatch('[^/]+') do
+                if name == 'root' then
+                    target = nodes[1];
+                elseif name:find('%.') then
+                    local col = ExtensionHandler.add(name); -- Get a colour for this file.
+                    target:addFile(name, File.new(name, col, target:getX() + love.math.random(-5, 5), target:getY() + love.math.random(-5, 5)));
+                else
+                    -- Get the next folder as a target. If that folder doesn't exist in our graph yet, create it first.
+                    local nt = target:getChild(name);
+                    if not nt then
                         -- Calculate random offset at which to place the new folder node.
                         local ox = love.math.random(5, 40) * (love.math.random(0, 1) == 0 and -1 or 1);
                         local oy = love.math.random(5, 40) * (love.math.random(0, 1) == 0 and -1 or 1);
 
-                        nodes[#nodes + 1] = Folder.new(target, folder, target:getX() + ox, target:getY() + oy);
-                        nTarget = target:addChild(folder, nodes[#nodes]);
+                        nodes[#nodes + 1] = Folder.new(target, name, target:getX() + ox, target:getY() + oy);
+                        target = target:addChild(name, nodes[#nodes]);
+                    else
+                        target = nt;
                     end
-                    recurse(path:sub(b + 1), nTarget);
-                else
-                    local col = ExtensionHandler.add(path); -- Get a colour for this file.
-                    target:addFile(path, File.new(path, col, target:getX() + love.math.random(-5, 5), target:getY() + love.math.random(-5, 5)));
                 end
             end
-
-            recurse(paths[i], tree);
         end
 
         return tree, nodes;
