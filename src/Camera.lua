@@ -26,13 +26,13 @@ function Camera.new()
     local self = {};
 
     local px, py = 0, 0;
-    local sx, sy = 1, 1;
+    local scale = 1;
 
     function self:set()
         love.graphics.push();
-        love.graphics.scale(sx, sy);
+        love.graphics.scale(scale, scale);
         love.graphics.translate(-px, -py);
-        love.graphics.translate(love.graphics.getWidth() / (2 * sx), love.graphics.getHeight() / (2 * sy));
+        love.graphics.translate(love.graphics.getWidth() / (2 * scale), love.graphics.getHeight() / (2 * scale));
     end
 
     function self:unset()
@@ -42,6 +42,10 @@ function Camera.new()
     function self:track(tarX, tarY, speed, dt)
         px = px - (px - math.floor(tarX)) * dt * speed;
         py = py - (py - math.floor(tarY)) * dt * speed;
+    end
+
+    function self:zoom(factor, dt)
+        scale = scale + factor * dt;
     end
 
     return self;

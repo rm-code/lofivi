@@ -39,10 +39,25 @@ function Graph.new()
 
     local tree;
     local nodes;
+    local minX, maxX, minY, maxY;
 
     -- ------------------------------------------------
     -- Private Functions
     -- ------------------------------------------------
+
+    local function updateBoundaries(minX, maxX, minY, maxY, nx, ny)
+        if nx < minX then
+            minX = nx;
+        elseif nx > maxX then
+            maxX = nx;
+        end
+        if ny < minY then
+            minY = ny;
+        elseif ny > maxY then
+            maxY = ny;
+        end
+        return minX, maxX, minY, maxY;
+    end
 
     ---
     -- Creates a file tree based on a sequence containing
@@ -51,31 +66,34 @@ function Graph.new()
     -- @param paths
     --
     local function createGraph(paths)
-        local nodes = { Folder.new(nil, '', love.graphics.getWidth() * 0.5, love.graphics.getHeight() * 0.5) };
+        local nodes = { Folder.new(nil, 'root', love.graphics.getWidth() * 0.5, love.graphics.getHeight() * 0.5) };
         local tree = nodes[#nodes];
 
-        -- Iterate over each file path and recursively create
-        -- the tree structure for this path.
         for i = 1, #paths do
-            local function recurse(path, target)
-                local b, e, f = path:find('/', 1);
+            local target;
 
-                if b and e then
-                    local folder = path:sub(1, b - 1);
-                    local nTarget = target:getChild(folder);
-
-                    if not nTarget then
-                        nodes[#nodes + 1] = Folder.new(target, folder, love.math.random(20, 780), love.math.random(20, 580));
-                        nTarget = target:addChild(folder, nodes[#nodes]);
-                    end
-                    recurse(path:sub(b + 1), nTarget);
+            -- Split the path using pattern matching.
+            for name in paths[i]:gmatch('[^/]+') do
+                if name == 'root' then
+                    target = nodes[1];
+                elseif name:find('%.') then
+                    local col = ExtensionHandler.add(name); -- Get a colour for this file.
+                    target:addFile(name, File.new(name, col));
                 else
-                    local col = ExtensionHandler.add(path); -- Get a colour for this file.
-                    target:addFile(path, File.new(path, col, target:getX() + love.math.random(-5, 5), target:getY() + love.math.random(-5, 5)));
+                    -- Get the next folder as a target. If that folder doesn't exist in our graph yet, create it first.
+                    local nt = target:getChild(name);
+                    if not nt then
+                        -- Calculate random offset at which to place the new folder node.
+                        local ox = love.math.random(5, 40) * (love.math.random(0, 1) == 0 and -1 or 1);
+                        local oy = love.math.random(5, 40) * (love.math.random(0, 1) == 0 and -1 or 1);
+
+                        nodes[#nodes + 1] = Folder.new(target, name, target:getX() + ox, target:getY() + oy);
+                        target = target:addChild(name, nodes[#nodes]);
+                    else
+                        target = nt;
+                    end
                 end
             end
-
-            recurse(paths[i], tree);
         end
 
         return tree, nodes;
@@ -87,6 +105,7 @@ function Graph.new()
 
     function self:init(paths)
         tree, nodes = createGraph(paths);
+        minX, minY, maxX, maxY = tree:getX(), tree:getX(), tree:getY(), tree:getY();
     end
 
     function self:draw()
@@ -108,41 +127,12 @@ function Graph.new()
 
             nodeA:damp(0.95);
             nodeA:update(dt);
-            nodeA:move(dt);
+            local nx, ny = nodeA:move(dt);
+            minX, maxX, minY, maxY = updateBoundaries(minX, maxX, minY, maxY, nx, ny);
         end
-    end
-
-    function self:getBoundaries(nodes)
-        local minX = nodes[1]:getX();
-        local maxX = nodes[1]:getX();
-        local minY = nodes[1]:getY();
-        local maxY = nodes[1]:getY();
-
-        for i = 2, #nodes do
-            local nx, ny = nodes[i]:getX(), nodes[i]:getY();
-
-            if not minX or nx < minX then
-                minX = nx;
-            elseif not maxX or nx > maxX then
-                maxX = nx;
-            end
-            if not minY or ny < minY then
-                minY = ny;
-            elseif not maxY or ny > maxY then
-                maxY = ny;
-            end
-        end
-
-        return minX, maxX, minY, maxY;
     end
 
     function self:getCenter()
-        local minX, maxX, minY, maxY;
-        if nodes then
-            minX, maxX, minY, maxY = self:getBoundaries(nodes);
-        else
-            minX, maxX, minY, maxY = 0, 0, 0, 0;
-        end
         return minX + (maxX - minX) * 0.5, minY + (maxY - minY) * 0.5;
     end
 

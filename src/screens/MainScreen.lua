@@ -24,6 +24,7 @@ local Screen = require('lib/screenmanager/Screen');
 local ExtensionHandler = require('src/ExtensionHandler');
 local Graph = require('src/graph/Graph');
 local Camera = require('src/Camera');
+local ConfigReader = require('src/ConfigReader');
 
 -- ------------------------------------------------
 -- Module
@@ -42,6 +43,7 @@ After you have placed it there you can use the R-Key to regenerate the graph.
 
 LoFiVi will now open the file directory in which to place the folder.
 ]];
+local CAMERA_SPEED = 400;
 
 -- ------------------------------------------------
 -- Constructor
@@ -51,7 +53,10 @@ function MainScreen.new()
     local self = Screen.new();
 
     local camera;
+    local config;
     local graph;
+    local cx, cy;
+    local ox, oy;
 
     -- ------------------------------------------------
     -- Private Functions
@@ -64,7 +69,7 @@ function MainScreen.new()
     -- @param dir
     --
     local function recursivelyGetDirectoryItems(dir)
-        local catalogue = {};
+        local pathsList = {};
 
         local function recurse(dir)
             local items = love.filesystem.getDirectoryItems(dir);
@@ -73,7 +78,7 @@ function MainScreen.new()
                 if love.filesystem.isDirectory(file) then
                     recurse(file);
                 elseif love.filesystem.isFile(file) then
-                    catalogue[#catalogue + 1] = file;
+                    pathsList[#pathsList + 1] = file;
                 end
             end
         end
@@ -81,9 +86,14 @@ function MainScreen.new()
         -- Start recursion.
         recurse(dir);
 
-        return catalogue;
+        return pathsList;
     end
 
+    ---
+    -- Creates the necessary folders if they don't exist yet, shows a
+    -- message box to the user and opens the root folder in a
+    -- finder / explorer window.
+    --
     local function setUpFolders()
         if not love.filesystem.isDirectory('root') or #love.filesystem.getDirectoryItems('root') == 0 then
             love.filesystem.createDirectory('root');
@@ -92,19 +102,70 @@ function MainScreen.new()
         end
     end
 
+    ---
+    -- This function goes over the list of file and folder paths and
+    -- checks if a path should be ignored based on the custom ignore list
+    -- read from the config file.
+    -- @param paths
+    -- @param ignoreList
+    --
+    local function ignoreFiles(paths, ignoreList)
+        local newList = {};
+        for _, path in ipairs(paths) do
+
+            -- Check if one of the patterns matches the path.
+            local ignore = false;
+            for _, pattern in ipairs(ignoreList) do
+                if path:match(pattern) then
+                    ignore = true;
+                    print('Ignore path: ' .. path);
+                end
+            end
+
+            -- Included the path into the new list if none of the patterns matched.
+            if not ignore then
+                newList[#newList + 1] = path;
+            end
+        end
+        return newList;
+    end
+
+    ---
+    -- Grabs a screenshot and stores as a png-file using a unix
+    -- timestap as a name. It will also set up a 'screenshots' folder
+    -- in LoFiVi's save directory if it doesn't exist yet.
+    --
+    local function createScreenshot()
+        local screenshot = love.graphics.newScreenshot();
+        love.filesystem.createDirectory('screenshots');
+        screenshot:encode('screenshots/' .. os.time() .. '.png');
+    end
+
     -- ------------------------------------------------
     -- Public Functions
     -- ------------------------------------------------
 
     function self:init()
-        camera = Camera.new();
-
+        -- Set up the necessary folders.
         setUpFolders();
 
-        local fileCatalogue = recursivelyGetDirectoryItems('root', '');
+        -- Load configuration file and set options.
+        config = ConfigReader.init();
+        love.graphics.setBackgroundColor(config.options.bgColor);
+        ExtensionHandler.setColorTable(config.fileColors);
 
+        -- Create the camera.
+        camera = Camera.new();
+        cx, cy = 0, 0; -- Camera tracking position.
+        ox, oy = 0, 0; -- Camera offset.
+
+        -- Read the files and folders and checks if some of them will be ignored.
+        local pathsList = recursivelyGetDirectoryItems('root', '');
+        pathsList = ignoreFiles(pathsList, config.ignore);
+
+        -- Create a graph using the edited list of files and folders.
         graph = Graph.new();
-        graph:init(fileCatalogue);
+        graph:init(pathsList);
     end
 
     function self:draw()
@@ -117,8 +178,24 @@ function MainScreen.new()
     function self:update(dt)
         graph:update(dt);
 
-        local cx, cy = graph:getCenter();
-        camera:track(cx, cy, 5, dt);
+        if love.keyboard.isDown('+') then
+            camera:zoom(0.6, dt);
+        elseif love.keyboard.isDown('-') then
+            camera:zoom(-0.6, dt);
+        end
+        if love.keyboard.isDown('up') then
+            oy = oy - dt * CAMERA_SPEED;
+        elseif love.keyboard.isDown('down') then
+            oy = oy + dt * CAMERA_SPEED;
+        end
+        if love.keyboard.isDown('left') then
+            ox = ox - dt * CAMERA_SPEED;
+        elseif love.keyboard.isDown('right') then
+            ox = ox + dt * CAMERA_SPEED;
+        end
+
+        cx, cy = graph:getCenter();
+        camera:track(cx + ox, cy + oy, 2, dt);
     end
 
     function self:keypressed(key)
@@ -126,6 +203,8 @@ function MainScreen.new()
             ExtensionHandler.reset();
             local fileCatalogue = recursivelyGetDirectoryItems('root', '');
             graph:init(fileCatalogue);
+        elseif key == 's' then
+            createScreenshot();
         end
     end
 

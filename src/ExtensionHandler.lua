@@ -28,6 +28,7 @@ local FileManager = {};
 
 local extensions = {};
 local totalFiles = 0;
+local colors;
 
 -- ------------------------------------------------
 -- Local Functions
@@ -77,7 +78,7 @@ function FileManager.add(fileName)
     if not extensions[ext] then
         extensions[ext] = {};
         extensions[ext].amount = 0;
-        extensions[ext].color = { love.math.random(0, 255), love.math.random(0, 255), love.math.random(0, 255) };
+        extensions[ext].color = colors[ext] or { love.math.random(0, 255), love.math.random(0, 255), love.math.random(0, 255) };
     end
     extensions[ext].amount = extensions[ext].amount + 1;
     totalFiles = totalFiles + 1;
@@ -88,6 +89,14 @@ end
 function FileManager.reset()
     extensions = {};
     totalFiles = 0;
+end
+
+-- ------------------------------------------------
+-- Setters
+-- ------------------------------------------------
+
+function FileManager.setColorTable(cltbl)
+    colors = cltbl;
 end
 
 -- ------------------------------------------------

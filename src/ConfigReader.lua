@@ -20,41 +20,75 @@
 -- THE SOFTWARE.                                                                                   =
 --==================================================================================================
 
-local File = {};
+local ConfigReader = {};
 
 -- ------------------------------------------------
--- Constructor
+-- Constants
 -- ------------------------------------------------
 
-function File.new(name, color)
-    local self = {};
+local FILE_NAME = 'config.lua';
+local FILE_TEMPLATE = [[
+-- ------------------------------- --
+-- LoFiVi - Configuration File.    --
+-- ------------------------------- --
 
-    local px, py;
-    local ox, oy;
+return {
+    options = {
+        bgColor = { 0, 0, 0 },
+    },
 
-    -- ------------------------------------------------
-    -- Public Functions
-    -- ------------------------------------------------
+    -- Can be used to assign a specific color to a file extension (RGB or RGBA).
+    fileColors = {
+        -- ['.example'] = { 255, 0, 0, 255 },
+    },
 
-    function self:draw()
-        love.graphics.setColor(color);
-        love.graphics.circle('line', px + ox, py + oy, 5, 20);
-        love.graphics.setColor(255, 255, 255, 255);
+    -- You can use lua patterns or simple string matching to ignore
+    -- certain files and folders when creating a graph.
+    ignore = {
+        '^.*%/%.',          -- Ignore files and folders that start with a fullstop.
+    },
+};
+]]
+
+-- ------------------------------------------------
+-- Local Variables
+-- ------------------------------------------------
+
+local config;
+
+-- ------------------------------------------------
+-- Local Functions
+-- ------------------------------------------------
+
+local function loadFile(name, default)
+    if not love.filesystem.isFile(name) then
+        local file = love.filesystem.newFile(name);
+        file:open('w');
+        file:write(default);
+        file:close();
     end
-
-    -- ------------------------------------------------
-    -- Setters
-    -- ------------------------------------------------
-
-    function self:setOffset(nox, noy)
-        ox, oy = nox, noy;
-    end
-
-    function self:setParentPosition(nx, ny)
-        px, py = nx, ny;
-    end
-
-    return self;
+    return love.filesystem.load(name)();
 end
 
-return File;
+-- ------------------------------------------------
+-- Public Functions
+-- ------------------------------------------------
+
+function ConfigReader.init()
+    config = loadFile(FILE_NAME, FILE_TEMPLATE);
+    return config;
+end
+
+-- ------------------------------------------------
+-- Getters
+-- ------------------------------------------------
+
+function ConfigReader.getConfig(section)
+    return config[section];
+end
+
+-- ------------------------------------------------
+-- Return Module
+-- ------------------------------------------------
+
+return ConfigReader;
