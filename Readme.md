@@ -2,17 +2,7 @@
 
 LoFiVi uses a force-directed graph to visualise folder structures. 
 
-Like its big sister [LoGiVi](https://bitbucket.org/rmcode/logivi), LoFiVi was inspired by other visualisation software like [Gource](https://code.google.com/p/gource/) or [Cytoscape](http://www.cytoscape.org/). I always was quite intrigued by the beautiful graphs they created and therefore wanted to learn how to make use of [force-directed graphs](http://en.wikipedia.org/wiki/Force-directed_graph_drawing) myself.
-
-LoFiVi mainly started as a test bed for LoGiVi. I wanted to be able to play around with the creation of a graph and the physical forces needed to create a decent layout. Since the creation of a graph in LoFiVi is far more simple than in LoGiVi, I can use it to find the best way to represent that graph in code, while making it easy (and efficient) to apply forces and update it. 
-
-### Instructions
-
-LÖVE currently can only read files from LoFiVi's save directory ([according to](https://bitbucket.org/rude/love/issue/985/add-an-open-file-popup-dialog-function#comment-15482823) one of the developers this will be changed in Version 0.10.0 though).
-
-When you run LoFiVi for the first time it will set up the necessary folders for you and open them with your Finder / Explorer.
-
-Now just place the folder structure you want to visualise into the root folder and re-run LoFiVi (or just press the R-Key if LoFiVi is still open).
+Check the [wiki](https://bitbucket.org/rmcode/lofivi/wiki/Home) for instructions and further information.
 
 ### License
 Copyright (C) 2015 by Robert Machmer                                                       
