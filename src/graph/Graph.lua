@@ -41,6 +41,12 @@ function Graph.new()
     local nodes;
     local minX, maxX, minY, maxY;
 
+    local sprite = love.graphics.newCanvas(20, 20, 'normal', 16);
+    sprite:renderTo(function()
+        love.graphics.circle('fill', 10, 10, 7, 30);
+    end);
+    local spritebatch = love.graphics.newSpriteBatch(sprite, 10000, 'stream');
+
     -- ------------------------------------------------
     -- Private Functions
     -- ------------------------------------------------
@@ -66,7 +72,7 @@ function Graph.new()
     -- @param paths
     --
     local function createGraph(paths)
-        local nodes = { Folder.new(nil, 'root', love.graphics.getWidth() * 0.5, love.graphics.getHeight() * 0.5) };
+        local nodes = { Folder.new(spritebatch, nil, 'root', love.graphics.getWidth() * 0.5, love.graphics.getHeight() * 0.5) };
         local tree = nodes[#nodes];
 
         for i = 1, #paths do
@@ -94,7 +100,7 @@ function Graph.new()
                         local ox = love.math.random(5, 40) * (love.math.random(0, 1) == 0 and -1 or 1);
                         local oy = love.math.random(5, 40) * (love.math.random(0, 1) == 0 and -1 or 1);
 
-                        nodes[#nodes + 1] = Folder.new(target, name, target:getX() + ox, target:getY() + oy);
+                        nodes[#nodes + 1] = Folder.new(spritebatch, target, name, target:getX() + ox, target:getY() + oy);
                         target = target:addChild(name, nodes[#nodes]);
                     else
                         target = nt;
@@ -117,9 +123,11 @@ function Graph.new()
 
     function self:draw()
         tree:draw();
+        love.graphics.draw(spritebatch);
     end
 
     function self:update(dt)
+        spritebatch:clear();
         for i = 1, #nodes do
             local nodeA = nodes[i];
             for j = 1, #nodes do

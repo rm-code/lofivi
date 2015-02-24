@@ -32,7 +32,7 @@ local FORCE_MAX = 4;
 -- Constructor
 -- ------------------------------------------------
 
-function Folder.new(parent, name, x, y)
+function Folder.new(spriteBatch, parent, name, x, y)
     local self = {};
 
     local files = {};
@@ -145,9 +145,6 @@ function Folder.new(parent, name, x, y)
         love.graphics.setColor(255, 255, 255, 35);
         love.graphics.print(name, px + 5, py + 5);
         love.graphics.setColor(255, 255, 255, 255);
-        for _, file in pairs(files) do
-            file:draw();
-        end
         for _, node in pairs(children) do
             love.graphics.setColor(255, 255, 255, 55);
             love.graphics.line(px, py, node:getX(), node:getY());
@@ -158,7 +155,8 @@ function Folder.new(parent, name, x, y)
 
     function self:update(dt)
         for _, file in pairs(files) do
-            file:setParentPosition(px, py);
+            spriteBatch:setColor(file:getColor());
+            spriteBatch:add(px + file:getOffsetX(), py + file:getOffsetY(), 0, 1, 1, 10,10);
         end
     end
 
