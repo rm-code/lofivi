@@ -73,10 +73,17 @@ function Graph.new()
             local target;
 
             -- Split the path using pattern matching.
-            for name in paths[i]:gmatch('[^/]+') do
+            local splitPath = {};
+            for part in paths[i]:gmatch('[^/]+') do
+                splitPath[#splitPath + 1] = part;
+            end
+
+            -- Iterate over the split parts and create folders and files.
+            for i = 1, #splitPath do
+                local name = splitPath[i];
                 if name == 'root' then
                     target = nodes[1];
-                elseif name:find('%.') then
+                elseif i == #splitPath then
                     local col = ExtensionHandler.add(name); -- Get a colour for this file.
                     target:addFile(name, File.new(name, col));
                 else
