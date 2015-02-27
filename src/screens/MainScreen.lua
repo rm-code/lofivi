@@ -166,6 +166,8 @@ function MainScreen.new()
         -- Create a graph using the edited list of files and folders.
         graph = Graph.new(config.options.showLabels);
         graph:init(pathsList);
+
+        ExtensionHandler.createSortedTable();
     end
 
     function self:draw()

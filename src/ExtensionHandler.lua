@@ -27,6 +27,7 @@ local ExtensionHandler = {};
 -- ------------------------------------------------
 
 local extensions = {};
+local sortedList;
 local totalFiles = 0;
 local colors;
 
@@ -60,11 +61,11 @@ function ExtensionHandler.draw()
     local count = 0;
     love.graphics.print(totalFiles, love.graphics.getWidth() - 120, 20);
     love.graphics.print('Files', love.graphics.getWidth() - 80, 20);
-    for ext, tbl in pairs(extensions) do
+    for i = 1, #sortedList do
         count = count + 1;
-        love.graphics.setColor(tbl.color);
-        love.graphics.print(ext, love.graphics.getWidth() - 80, 20 + count * 20);
-        love.graphics.print(tbl.amount, love.graphics.getWidth() - 120, 20 + count * 20);
+        love.graphics.setColor(sortedList[i].color);
+        love.graphics.print(sortedList[i].extension, love.graphics.getWidth() - 80, 20 + count * 20);
+        love.graphics.print(sortedList[i].count, love.graphics.getWidth() - 120, 20 + count * 20);
         love.graphics.setColor(255, 255, 255);
     end
 end
@@ -89,6 +90,17 @@ end
 function ExtensionHandler.reset()
     extensions = {};
     totalFiles = 0;
+end
+
+function ExtensionHandler.createSortedTable()
+    local toSort = {};
+    for ext, tbl in pairs(extensions) do
+        toSort[#toSort + 1] = { count = tbl.amount, color = tbl.color, extension = ext };
+    end
+    table.sort(toSort, function(a, b)
+        return a.count > b.count;
+    end)
+    sortedList = toSort;
 end
 
 -- ------------------------------------------------
