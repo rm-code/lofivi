@@ -20,7 +20,7 @@
 -- THE SOFTWARE.                                                                                   =
 --==================================================================================================
 
-local FileManager = {};
+local ExtensionHandler = {};
 
 -- ------------------------------------------------
 -- Local Variables
@@ -56,7 +56,7 @@ end
 ---
 -- Draws a list of all authors working on the project.
 --
-function FileManager.draw()
+function ExtensionHandler.draw()
     local count = 0;
     love.graphics.print(totalFiles, love.graphics.getWidth() - 120, 20);
     love.graphics.print('Files', love.graphics.getWidth() - 80, 20);
@@ -73,7 +73,7 @@ end
 -- Adds a new file extension to the list.
 -- @param fileName
 --
-function FileManager.add(fileName)
+function ExtensionHandler.add(fileName)
     local ext = splitExtension(fileName);
     if not extensions[ext] then
         extensions[ext] = {};
@@ -86,7 +86,7 @@ function FileManager.add(fileName)
     return extensions[ext].color;
 end
 
-function FileManager.reset()
+function ExtensionHandler.reset()
     extensions = {};
     totalFiles = 0;
 end
@@ -95,7 +95,7 @@ end
 -- Setters
 -- ------------------------------------------------
 
-function FileManager.setColorTable(cltbl)
+function ExtensionHandler.setColorTable(cltbl)
     colors = cltbl;
 end
 
@@ -106,7 +106,7 @@ end
 ---
 -- @param ext
 --
-function FileManager.getColor(ext)
+function ExtensionHandler.getColor(ext)
     return extensions[ext].color;
 end
 
@@ -114,4 +114,4 @@ end
 -- Return Module
 -- ------------------------------------------------
 
-return FileManager;
+return ExtensionHandler;
