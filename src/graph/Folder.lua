@@ -28,6 +28,9 @@ local Folder = {};
 
 local FORCE_MAX = 4;
 
+local LABEL_FONT = love.graphics.newFont(25);
+local DEFAULT_FONT = love.graphics.newFont(12);
+
 -- ------------------------------------------------
 -- Constructor
 -- ------------------------------------------------
@@ -44,6 +47,8 @@ function Folder.new(spriteBatch, parent, name, x, y)
     local px, py = x, y; -- Position.
     local vx, vy = 0, 0; -- Velocity.
     local ax, ay = 0, 0; -- Acceleration.
+
+    local radius = 0;
 
     -- ------------------------------------------------
     -- Private Functions
@@ -134,6 +139,7 @@ function Folder.new(spriteBatch, parent, name, x, y)
             local y = (layers[layer].radius * math.sin((angle * (fileCounter - 1)) * (math.pi / 180)));
             file:setOffset(x, y);
         end
+        return layers[layer].radius;
     end
 
     -- ------------------------------------------------
@@ -142,9 +148,11 @@ function Folder.new(spriteBatch, parent, name, x, y)
 
     function self:draw()
         love.graphics.circle('fill', px, py, 2, 10);
-        love.graphics.setColor(255, 255, 255, 35);
-        love.graphics.print(name, px + 5, py + 5);
+        love.graphics.setFont(LABEL_FONT);
+        love.graphics.setColor(255, 255, 255, 105);
+        love.graphics.print(name, px + 10 + radius, py + 10);
         love.graphics.setColor(255, 255, 255, 255);
+        love.graphics.setFont(DEFAULT_FONT);
         for _, node in pairs(children) do
             love.graphics.setColor(255, 255, 255, 55);
             love.graphics.line(px, py, node:getX(), node:getY());
@@ -163,7 +171,7 @@ function Folder.new(spriteBatch, parent, name, x, y)
     function self:addFile(name, file)
         files[name] = file;
         fileCount = fileCount + 1;
-        plotCircle(files, fileCount);
+        radius = plotCircle(files, fileCount);
     end
 
     function self:addChild(name, folder)
