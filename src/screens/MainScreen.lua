@@ -205,6 +205,8 @@ function MainScreen.new()
             graph:init(fileCatalogue);
         elseif key == 's' then
             createScreenshot();
+        elseif key == 'l' then
+            graph:toggleLabels()
         end
     end
 

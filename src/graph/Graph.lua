@@ -41,6 +41,8 @@ function Graph.new()
     local nodes;
     local minX, maxX, minY, maxY;
 
+    local showLabels = false;
+
     local sprite = love.graphics.newCanvas(20, 20, 'normal', 16);
     sprite:renderTo(function()
         love.graphics.circle('fill', 10, 10, 7, 30);
@@ -122,7 +124,7 @@ function Graph.new()
     end
 
     function self:draw()
-        tree:draw();
+        tree:draw(showLabels);
         love.graphics.draw(spritebatch);
     end
 
@@ -145,6 +147,10 @@ function Graph.new()
             local nx, ny = nodeA:move(dt);
             minX, maxX, minY, maxY = updateBoundaries(minX, maxX, minY, maxY, nx, ny);
         end
+    end
+
+    function self:toggleLabels()
+        showLabels = not showLabels;
     end
 
     function self:getCenter()
