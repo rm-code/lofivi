@@ -164,7 +164,7 @@ function MainScreen.new()
         pathsList = ignoreFiles(pathsList, config.ignore);
 
         -- Create a graph using the edited list of files and folders.
-        graph = Graph.new();
+        graph = Graph.new(config.options.showLabels);
         graph:init(pathsList);
     end
 

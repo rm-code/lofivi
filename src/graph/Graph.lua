@@ -34,14 +34,14 @@ local Graph = {};
 -- Constructor
 -- ------------------------------------------------
 
-function Graph.new()
+function Graph.new(showLabels)
     local self = {};
 
     local tree;
     local nodes;
     local minX, maxX, minY, maxY;
 
-    local showLabels = false;
+    local showLabels = showLabels;
 
     local sprite = love.graphics.newCanvas(20, 20, 'normal', 16);
     sprite:renderTo(function()

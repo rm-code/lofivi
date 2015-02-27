@@ -35,6 +35,7 @@ local FILE_TEMPLATE = [[
 return {
     options = {
         bgColor = { 0, 0, 0 },
+        showLabels = false,
     },
 
     -- Can be used to assign a specific color to a file extension (RGB or RGBA).
