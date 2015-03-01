@@ -169,10 +169,10 @@ function MainScreen.new()
     end
 
     function self:draw()
-        ExtensionHandler.draw();
         camera:set();
         graph:draw();
         camera:unset();
+        ExtensionHandler.draw();
     end
 
     function self:update(dt)
