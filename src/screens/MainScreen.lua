@@ -210,6 +210,8 @@ function MainScreen.new()
             createScreenshot();
         elseif key == 'l' then
             graph:toggleLabels()
+        elseif key == 'e' then
+            ExtensionHandler.toggleVisible();
         end
     end
 

@@ -108,6 +108,10 @@ function ExtensionHandler.createSortedTable()
     sortedList = toSort;
 end
 
+function ExtensionHandler.toggleVisible()
+    visible = not visible;
+end
+
 -- ------------------------------------------------
 -- Setters
 -- ------------------------------------------------
