@@ -22,6 +22,18 @@
 
 local Panel = {};
 
+-- ------------------------------------------------
+-- Constants
+-- ------------------------------------------------
+
+local MIN_HEIGHT = 100;
+local MIN_WIDTH = 100;
+local BORDER_SIZE = 10;
+
+-- ------------------------------------------------
+-- Constructor
+-- ------------------------------------------------
+
 function Panel.new(x, y, w, h)
     local self = {};
 
@@ -29,41 +41,97 @@ function Panel.new(x, y, w, h)
     local h = math.min(love.graphics.getHeight(), h);
     local x = math.min(love.graphics.getWidth() - w, x);
     local y = math.min(love.graphics.getHeight() - h, y);
+
     local content;
-    local border = 10;
     local contentOffsetX, contentOffsetY = 0, 0;
     local contentFocus = false;
     local headerFocus = false;
     local cornerFocus = false;
-    local minHeight = 100;
-    local minWidth = 100;
+
+    -- ------------------------------------------------
+    -- Public Functions
+    -- ------------------------------------------------
 
     function self:draw()
         love.graphics.setColor(255, 255, 255, contentFocus and 40 or 20);
-        love.graphics.rectangle('fill', x + border, y + border, w - 2 * border, h - 2 * border);
+        love.graphics.rectangle('fill', x + BORDER_SIZE, y + BORDER_SIZE, w - 2 * BORDER_SIZE, h - 2 * BORDER_SIZE);
 
         love.graphics.setColor(255, 255, 255, headerFocus and 50 or 30);
-        love.graphics.rectangle('fill', x + border, y, w - 2 * border, border);
+        love.graphics.rectangle('fill', x + BORDER_SIZE, y, w - 2 * BORDER_SIZE, BORDER_SIZE);
 
         love.graphics.setColor(255, 255, 255, cornerFocus and 40 or 20);
-        love.graphics.rectangle('fill', x + w - border, y + h - border, border, border);
+        love.graphics.rectangle('fill', x + w - BORDER_SIZE, y + h - BORDER_SIZE, BORDER_SIZE, BORDER_SIZE);
 
         love.graphics.setColor(255, 255, 255, 255);
-        love.graphics.setScissor(x + border, y + border, w - 2 * border, h - 2 * border);
-        love.graphics.draw(content, x + contentOffsetX + border, y + contentOffsetY + border);
+        love.graphics.setScissor(x + BORDER_SIZE, y + BORDER_SIZE, w - 2 * BORDER_SIZE, h - 2 * BORDER_SIZE);
+        love.graphics.draw(content, x + contentOffsetX + BORDER_SIZE, y + contentOffsetY + BORDER_SIZE);
         love.graphics.setScissor();
     end
 
+    ---
+    -- Updates the panel and checks if the mouse is hovering over
+    -- any elements.
+    -- @param dt
+    --
     function self:update(dt)
         local mx, my = love.mouse.getPosition();
-        contentFocus = x + border < mx and x + w - border > mx and y + border < my and y + h - border > my;
-        cornerFocus = x + w - border < mx and x + w > mx and y + h - border < my and y + h > my;
-        headerFocus = x < mx and x + w > mx and y < my and y + border > my;
+        contentFocus = x + BORDER_SIZE < mx and x + w - BORDER_SIZE > mx and y + BORDER_SIZE < my and y + h - BORDER_SIZE > my;
+        cornerFocus = x + w - BORDER_SIZE < mx and x + w > mx and y + h - BORDER_SIZE < my and y + h > my;
+        headerFocus = x < mx and x + w > mx and y < my and y + BORDER_SIZE > my;
     end
+
+    ---
+    -- Scrolls the panel's content.
+    -- @param dx
+    -- @param dy
+    --
+    function self:scroll(dx, dy)
+        contentOffsetX = contentOffsetX + dx;
+        contentOffsetY = contentOffsetY + dy;
+    end
+
+    ---
+    -- Resizes the panel and resets the content's offset.
+    -- @param mx
+    -- @param my
+    --
+    function self:resize(mx, my)
+        contentOffsetX, contentOffsetY = 0, 0;
+        w = math.max(MIN_WIDTH, math.min(love.graphics.getWidth() - x, mx - x + BORDER_SIZE));
+        h = math.max(MIN_HEIGHT, math.min(love.graphics.getHeight() - y, my - y + BORDER_SIZE));
+    end
+
+    -- ------------------------------------------------
+    -- Setters
+    -- ------------------------------------------------
 
     function self:setContent(c)
         content = c;
     end
+
+    ---
+    -- Sets the position of the panel's content.
+    -- @param x
+    -- @param y
+    --
+    function self:setContentPosition(x, y)
+        contentOffsetX, contentOffsetY = x, y;
+    end
+
+    ---
+    -- Sets the position of the panel on screen.
+    -- The values are clamped so the panel can't be moved offscreen.
+    -- @param nx
+    -- @param ny
+    --
+    function self:setPosition(nx, ny)
+        x = math.min(love.graphics.getWidth() - w, nx);
+        y = math.min(love.graphics.getHeight() - h, ny);
+    end
+
+    -- ------------------------------------------------
+    -- Getters
+    -- ------------------------------------------------
 
     function self:hasContentFocus()
         return contentFocus;
@@ -75,34 +143,6 @@ function Panel.new(x, y, w, h)
 
     function self:hasHeaderFocus()
         return headerFocus;
-    end
-
-    function self:scroll(dx, dy)
-        contentOffsetX = contentOffsetX + dx;
-        contentOffsetY = contentOffsetY + dy;
-    end
-
-    function self:setContentPosition(x, y)
-        contentOffsetX, contentOffsetY = x, y;
-    end
-
-    function self:resize(mx, my)
-        contentOffsetX, contentOffsetY = 0, 0;
-        w = math.max(minWidth, math.min(love.graphics.getWidth() - x, mx - x + border));
-        h = math.max(minHeight, math.min(love.graphics.getHeight() - y, my - y + border));
-    end
-
-    function self:setPosition(nx, ny)
-        x = math.min(love.graphics.getWidth() - w, nx);
-        y = math.min(love.graphics.getHeight() - h, ny);
-    end
-
-    function self:getWidth()
-        return w;
-    end
-
-    function self:getHeight()
-        return h;
     end
 
     return self;
