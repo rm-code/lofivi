@@ -25,6 +25,7 @@ local ExtensionHandler = require('src/ExtensionHandler');
 local Graph = require('src/graph/Graph');
 local Camera = require('src/Camera');
 local ConfigReader = require('src/ConfigReader');
+local Panel = require('src/Panel');
 
 -- ------------------------------------------------
 -- Module
@@ -75,6 +76,16 @@ function MainScreen.new()
     local graph;
     local cx, cy;
     local ox, oy;
+
+    local panel;
+    local visible;
+
+    local pmy = 0; -- Previous position of the mouse on the y-axis.
+    local dmy = 0; -- Delta movement of the mouse between updates on the y-axis.
+    local clickTime = 0;
+    local resize = false;
+    local drag = false;
+    local scroll = false;
 
     -- ------------------------------------------------
     -- Private Functions
@@ -170,7 +181,6 @@ function MainScreen.new()
         -- Load configuration file and set options.
         config = ConfigReader.init();
         love.graphics.setBackgroundColor(config.options.bgColor);
-        ExtensionHandler.setVisible(config.options.showFileList);
         ExtensionHandler.setColorTable(config.fileColors);
 
         -- Load key bindings.
@@ -200,18 +210,44 @@ function MainScreen.new()
         graph = Graph.new(config.options.showLabels);
         graph:init(pathsList);
 
-        ExtensionHandler.createSortedTable();
+        local canvas = ExtensionHandler.createCanvas();
+        panel = Panel.new(love.graphics.getWidth() - canvas:getWidth(), 0, canvas:getWidth(), canvas:getHeight() + 20);
+        panel:setContent(canvas);
+        visible = config.options.showFileList;
     end
 
     function self:draw()
         camera:set();
         graph:draw();
         camera:unset();
-        ExtensionHandler.draw();
+
+        if visible then
+            panel:draw();
+        end
     end
 
     function self:update(dt)
         graph:update(dt);
+        panel:update(dt);
+
+        -- Update relative mouse events.
+        clickTime = math.min(1.0, clickTime + dt);
+        if love.mouse.getY() ~= pmy then
+            dmy = pmy - love.mouse.getY();
+            pmy = love.mouse.getY();
+        else
+            dmy = 0;
+        end
+
+        if scroll then
+            panel:scroll(0, -dmy);
+        end
+        if resize then
+            panel:resize(love.mouse.getX(), love.mouse.getY());
+        end
+        if drag then
+            panel:setPosition(love.mouse.getX(), love.mouse.getY());
+        end
 
         if love.keyboard.isDown(camera_zoomIn) then
             camera:zoom(0.6, dt);
@@ -243,14 +279,40 @@ function MainScreen.new()
             ExtensionHandler.reset();
             local fileCatalogue = recursivelyGetDirectoryItems('root', '');
             graph:init(fileCatalogue);
-            ExtensionHandler.createSortedTable();
+            local canvas = ExtensionHandler.createCanvas();
+            panel:setContent(canvas);
         elseif key == take_screenshot then
             createScreenshot();
         elseif key == toggleLabels then
             graph:toggleLabels()
         elseif key == toggleFileList then
-            ExtensionHandler.toggleVisible();
+            visible = not visible;
         end
+    end
+
+    function self:mousepressed(x, y, b)
+        if panel:hasContentFocus() and b == 'l' then
+            scroll = true;
+        end
+        if panel:hasCornerFocus() and b == 'l' then
+            resize = true;
+        end
+        if panel:hasHeaderFocus() and b == 'l' then
+            drag = true;
+        end
+
+        if b == 'l' and clickTime < 0.5 and panel:hasContentFocus() then
+            panel:setContentPosition(0, 0);
+            clickTime = 0;
+        else
+            clickTime = 0;
+        end
+    end
+
+    function self:mousereleased(x, y, b)
+        resize = false;
+        drag = false;
+        scroll = false;
     end
 
     return self;

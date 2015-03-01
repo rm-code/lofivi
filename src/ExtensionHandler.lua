@@ -34,10 +34,8 @@ local DEFAULT_FONT = love.graphics.newFont(12);
 -- ------------------------------------------------
 
 local extensions = {};
-local sortedList;
 local totalFiles = 0;
 local colors;
-local visible;
 
 -- ------------------------------------------------
 -- Local Functions
@@ -62,13 +60,6 @@ end
 -- Global Functions
 -- ------------------------------------------------
 
-function ExtensionHandler.draw()
-    if not visible then
-        return;
-    end
-    love.graphics.draw(sortedList, love.graphics.getWidth() - sortedList:getWidth());
-end
-
 ---
 -- Adds a new file extension to the list.
 -- @param fileName
@@ -91,7 +82,7 @@ function ExtensionHandler.reset()
     totalFiles = 0;
 end
 
-function ExtensionHandler.createSortedTable()
+function ExtensionHandler.createCanvas()
     local toSort = {};
     for ext, tbl in pairs(extensions) do
         toSort[#toSort + 1] = { count = tbl.count, color = tbl.color, extension = ext };
@@ -100,7 +91,7 @@ function ExtensionHandler.createSortedTable()
         return a.count > b.count;
     end)
 
-    local width = 100;
+    local width = 150;
     local height = 20 + #toSort * 20;
 
     local canvas = love.graphics.newCanvas(width, height);
@@ -117,11 +108,7 @@ function ExtensionHandler.createSortedTable()
         love.graphics.setFont(DEFAULT_FONT);
     end);
 
-    sortedList = canvas;
-end
-
-function ExtensionHandler.toggleVisible()
-    visible = not visible;
+    return canvas;
 end
 
 -- ------------------------------------------------
@@ -130,10 +117,6 @@ end
 
 function ExtensionHandler.setColorTable(cltbl)
     colors = cltbl;
-end
-
-function ExtensionHandler.setVisible(nvis)
-    visible = nvis;
 end
 
 -- ------------------------------------------------
