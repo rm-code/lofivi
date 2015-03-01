@@ -98,10 +98,10 @@ function ExtensionHandler.createCanvas()
     canvas:renderTo(function()
         love.graphics.setBlendMode('premultiplied');
         love.graphics.setFont(LIST_FONT);
-        love.graphics.print(string.format('%6.d %s', totalFiles, 'Files', 0, 20));
+        love.graphics.print(string.format('%5.d %s', totalFiles, 'Files', 0, 20));
         for i = 1, #toSort do
             love.graphics.setColor(toSort[i].color);
-            love.graphics.print(string.format('%6.d %s', toSort[i].count, toSort[i].extension), 0, i * 20);
+            love.graphics.print(string.format('%5.d %s', toSort[i].count, toSort[i].extension), 0, i * 20);
             love.graphics.setColor(255, 255, 255);
         end
         love.graphics.setBlendMode('alpha');
