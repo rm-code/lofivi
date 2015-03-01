@@ -23,6 +23,13 @@
 local ExtensionHandler = {};
 
 -- ------------------------------------------------
+-- Constants
+-- ------------------------------------------------
+
+local LIST_FONT = love.graphics.newFont('res/fonts/SourceCodePro-Medium.otf', 14);
+local DEFAULT_FONT = love.graphics.newFont(12);
+
+-- ------------------------------------------------
 -- Local Variables
 -- ------------------------------------------------
 
@@ -59,17 +66,7 @@ function ExtensionHandler.draw()
     if not visible then
         return;
     end
-
-    local count = 0;
-    love.graphics.print(totalFiles, love.graphics.getWidth() - 120, 20);
-    love.graphics.print('Files', love.graphics.getWidth() - 80, 20);
-    for i = 1, #sortedList do
-        count = count + 1;
-        love.graphics.setColor(sortedList[i].color);
-        love.graphics.print(sortedList[i].extension, love.graphics.getWidth() - 80, 20 + count * 20);
-        love.graphics.print(sortedList[i].count, love.graphics.getWidth() - 120, 20 + count * 20);
-        love.graphics.setColor(255, 255, 255);
-    end
+    love.graphics.draw(sortedList, love.graphics.getWidth() - sortedList:getWidth());
 end
 
 ---
@@ -102,7 +99,25 @@ function ExtensionHandler.createSortedTable()
     table.sort(toSort, function(a, b)
         return a.count > b.count;
     end)
-    sortedList = toSort;
+
+    local width = 100;
+    local height = 20 + #toSort * 20;
+
+    local canvas = love.graphics.newCanvas(width, height);
+    canvas:renderTo(function()
+        love.graphics.setBlendMode('premultiplied');
+        love.graphics.setFont(LIST_FONT);
+        love.graphics.print(string.format('%6.d %s', totalFiles, 'Files', 0, 20));
+        for i = 1, #toSort do
+            love.graphics.setColor(toSort[i].color);
+            love.graphics.print(string.format('%6.d %s', toSort[i].count, toSort[i].extension), 0, i * 20);
+            love.graphics.setColor(255, 255, 255);
+        end
+        love.graphics.setBlendMode('alpha');
+        love.graphics.setFont(DEFAULT_FONT);
+    end);
+
+    sortedList = canvas;
 end
 
 function ExtensionHandler.toggleVisible()
