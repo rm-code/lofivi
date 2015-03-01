@@ -46,6 +46,24 @@ LoFiVi will now open the file directory in which to place the folder.
 local CAMERA_SPEED = 400;
 
 -- ------------------------------------------------
+-- Controls
+-- ------------------------------------------------
+
+local camera_zoomIn;
+local camera_zoomOut;
+local camera_rotateL;
+local camera_rotateR;
+local camera_n;
+local camera_s;
+local camera_e;
+local camera_w;
+
+local graph_reset;
+local take_screenshot;
+local toggleLabels;
+local toggleFileList;
+
+-- ------------------------------------------------
 -- Constructor
 -- ------------------------------------------------
 
@@ -155,6 +173,20 @@ function MainScreen.new()
         ExtensionHandler.setVisible(config.options.showFileList);
         ExtensionHandler.setColorTable(config.fileColors);
 
+        -- Load key bindings.
+        camera_zoomIn = config.options.keyBindings.camera_zoomIn;
+        camera_zoomOut = config.options.keyBindings.camera_zoomOut;
+        camera_rotateL = config.options.keyBindings.camera_rotateL;
+        camera_rotateR = config.options.keyBindings.camera_rotateR;
+        camera_n = config.options.keyBindings.camera_n;
+        camera_s = config.options.keyBindings.camera_s;
+        camera_e = config.options.keyBindings.camera_e;
+        camera_w = config.options.keyBindings.camera_w;
+        graph_reset = config.options.keyBindings.graph_reset;
+        take_screenshot = config.options.keyBindings.take_screenshot;
+        toggleLabels = config.options.keyBindings.toggleLabels;
+        toggleFileList = config.options.keyBindings.toggleFileList;
+
         -- Create the camera.
         camera = Camera.new();
         cx, cy = 0, 0; -- Camera tracking position.
@@ -181,24 +213,24 @@ function MainScreen.new()
     function self:update(dt)
         graph:update(dt);
 
-        if love.keyboard.isDown('+') then
+        if love.keyboard.isDown(camera_zoomIn) then
             camera:zoom(0.6, dt);
-        elseif love.keyboard.isDown('-') then
+        elseif love.keyboard.isDown(camera_zoomOut) then
             camera:zoom(-0.6, dt);
         end
-        if love.keyboard.isDown('up') then
+        if love.keyboard.isDown(camera_n) then
             oy = oy - dt * CAMERA_SPEED;
-        elseif love.keyboard.isDown('down') then
+        elseif love.keyboard.isDown(camera_s) then
             oy = oy + dt * CAMERA_SPEED;
         end
-        if love.keyboard.isDown('left') then
+        if love.keyboard.isDown(camera_w) then
             ox = ox - dt * CAMERA_SPEED;
-        elseif love.keyboard.isDown('right') then
+        elseif love.keyboard.isDown(camera_e) then
             ox = ox + dt * CAMERA_SPEED;
         end
-        if love.keyboard.isDown('a') then
+        if love.keyboard.isDown(camera_rotateL) then
             camera:rotate(0.6, dt);
-        elseif love.keyboard.isDown('d') then
+        elseif love.keyboard.isDown(camera_rotateR) then
             camera:rotate(-0.6, dt);
         end
 
@@ -207,15 +239,15 @@ function MainScreen.new()
     end
 
     function self:keypressed(key)
-        if key == 'r' then
+        if key == graph_reset then
             ExtensionHandler.reset();
             local fileCatalogue = recursivelyGetDirectoryItems('root', '');
             graph:init(fileCatalogue);
-        elseif key == 's' then
+        elseif key == take_screenshot then
             createScreenshot();
-        elseif key == 'l' then
+        elseif key == toggleLabels then
             graph:toggleLabels()
-        elseif key == 'e' then
+        elseif key == toggleFileList then
             ExtensionHandler.toggleVisible();
         end
     end

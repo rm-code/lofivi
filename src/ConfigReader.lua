@@ -37,6 +37,22 @@ return {
         bgColor = { 0, 0, 0 },
         showLabels = false,
         showFileList = true,
+
+        -- See https://love2d.org/wiki/KeyConstant for a list of possible keycodes.
+        keyBindings = {
+            camera_n =        'w', -- Move camera up
+            camera_w =        'a', -- Move camera left
+            camera_s =        's', -- Move camera down
+            camera_e =        'd', -- Move camera right
+            camera_rotateL =  'q', -- Rotate camera left
+            camera_rotateR =  'e', -- Rotate camera right
+            camera_zoomIn =   '+', -- Zoom in
+            camera_zoomOut =  '-', -- Zoom out
+            graph_reset =     'r', -- Reloads the whole graph
+            take_screenshot = ' ', -- Take a screenshot
+            toggleLabels =    '1', -- Hide / Show labels
+            toggleFileList =  '2', -- Hide / Show file list
+        },
     },
 
     -- Can be used to assign a specific color to a file extension (RGB or RGBA).
