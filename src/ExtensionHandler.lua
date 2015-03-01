@@ -55,9 +55,6 @@ end
 -- Global Functions
 -- ------------------------------------------------
 
----
--- Draws a list of all authors working on the project.
---
 function ExtensionHandler.draw()
     if not visible then
         return;
