@@ -116,3 +116,11 @@ function love.keypressed(key)
     end
     ScreenManager.keypressed(key);
 end
+
+function love.mousepressed(x, y, b)
+    ScreenManager.mousepressed(x, y, b);
+end
+
+function love.mousereleased(x, y, b)
+    ScreenManager.mousereleased(x, y, b);
+end
