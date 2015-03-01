@@ -30,6 +30,7 @@ local extensions = {};
 local sortedList;
 local totalFiles = 0;
 local colors;
+local visible;
 
 -- ------------------------------------------------
 -- Local Functions
@@ -58,6 +59,10 @@ end
 -- Draws a list of all authors working on the project.
 --
 function ExtensionHandler.draw()
+    if not visible then
+        return;
+    end
+
     local count = 0;
     love.graphics.print(totalFiles, love.graphics.getWidth() - 120, 20);
     love.graphics.print('Files', love.graphics.getWidth() - 80, 20);
@@ -109,6 +114,10 @@ end
 
 function ExtensionHandler.setColorTable(cltbl)
     colors = cltbl;
+end
+
+function ExtensionHandler.setVisible(nvis)
+    visible = nvis;
 end
 
 -- ------------------------------------------------

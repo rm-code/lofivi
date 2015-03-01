@@ -152,6 +152,7 @@ function MainScreen.new()
         -- Load configuration file and set options.
         config = ConfigReader.init();
         love.graphics.setBackgroundColor(config.options.bgColor);
+        ExtensionHandler.setVisible(config.options.showFileList);
         ExtensionHandler.setColorTable(config.fileColors);
 
         -- Create the camera.
