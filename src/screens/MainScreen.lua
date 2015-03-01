@@ -243,6 +243,7 @@ function MainScreen.new()
             ExtensionHandler.reset();
             local fileCatalogue = recursivelyGetDirectoryItems('root', '');
             graph:init(fileCatalogue);
+            ExtensionHandler.createSortedTable();
         elseif key == take_screenshot then
             createScreenshot();
         elseif key == toggleLabels then
