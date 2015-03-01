@@ -129,6 +129,7 @@ function Graph.new(showLabels)
     end
 
     function self:update(dt)
+        minX, maxX, minY, maxY = tree:getX(), tree:getX(), tree:getY(), tree:getY();
         spritebatch:clear();
         for i = 1, #nodes do
             local nodeA = nodes[i];
