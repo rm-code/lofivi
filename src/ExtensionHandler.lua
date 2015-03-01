@@ -83,10 +83,10 @@ function ExtensionHandler.add(fileName)
     local ext = splitExtension(fileName);
     if not extensions[ext] then
         extensions[ext] = {};
-        extensions[ext].amount = 0;
+        extensions[ext].count = 0;
         extensions[ext].color = colors[ext] or { love.math.random(0, 255), love.math.random(0, 255), love.math.random(0, 255) };
     end
-    extensions[ext].amount = extensions[ext].amount + 1;
+    extensions[ext].count = extensions[ext].count + 1;
     totalFiles = totalFiles + 1;
 
     return extensions[ext].color;
@@ -100,7 +100,7 @@ end
 function ExtensionHandler.createSortedTable()
     local toSort = {};
     for ext, tbl in pairs(extensions) do
-        toSort[#toSort + 1] = { count = tbl.amount, color = tbl.color, extension = ext };
+        toSort[#toSort + 1] = { count = tbl.count, color = tbl.color, extension = ext };
     end
     table.sort(toSort, function(a, b)
         return a.count > b.count;
