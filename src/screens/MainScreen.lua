@@ -170,6 +170,21 @@ function MainScreen.new()
         screenshot:encode('screenshots/' .. os.time() .. '.png');
     end
 
+    local function createGraph(path, config)
+        -- Read the files and folders and checks if some of them will be ignored.
+        local pathsList = ignoreFiles(recursivelyGetDirectoryItems(path), config.ignore);
+
+        -- Create a graph using the edited list of files and folders.
+        local graph = Graph.new(config.options.showLabels);
+        graph:init(pathsList);
+
+        local canvas = ExtensionHandler.createCanvas();
+        local panel = Panel.new(love.graphics.getWidth() - canvas:getWidth(), 0, canvas:getWidth(), canvas:getHeight() + 20);
+        panel:setContent(canvas);
+
+        return graph, panel;
+    end
+
     -- ------------------------------------------------
     -- Public Functions
     -- ------------------------------------------------
@@ -202,17 +217,7 @@ function MainScreen.new()
         cx, cy = 0, 0; -- Camera tracking position.
         ox, oy = 0, 0; -- Camera offset.
 
-        -- Read the files and folders and checks if some of them will be ignored.
-        local pathsList = recursivelyGetDirectoryItems('root', '');
-        pathsList = ignoreFiles(pathsList, config.ignore);
-
-        -- Create a graph using the edited list of files and folders.
-        graph = Graph.new(config.options.showLabels);
-        graph:init(pathsList);
-
-        local canvas = ExtensionHandler.createCanvas();
-        panel = Panel.new(love.graphics.getWidth() - canvas:getWidth(), 0, canvas:getWidth(), canvas:getHeight() + 20);
-        panel:setContent(canvas);
+        graph, panel = createGraph('root', config);
         visible = config.options.showFileList;
     end
 
@@ -277,10 +282,7 @@ function MainScreen.new()
     function self:keypressed(key)
         if key == graph_reset then
             ExtensionHandler.reset();
-            local fileCatalogue = recursivelyGetDirectoryItems('root', '');
-            graph:init(fileCatalogue);
-            local canvas = ExtensionHandler.createCanvas();
-            panel:setContent(canvas);
+            graph, panel = createGraph('root', config);
         elseif key == take_screenshot then
             createScreenshot();
         elseif key == toggleLabels then
