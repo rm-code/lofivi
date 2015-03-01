@@ -20,7 +20,14 @@
 -- THE SOFTWARE.                                                                                   =
 --==================================================================================================
 
-local FileManager = {};
+local ExtensionHandler = {};
+
+-- ------------------------------------------------
+-- Constants
+-- ------------------------------------------------
+
+local LIST_FONT = love.graphics.newFont('res/fonts/SourceCodePro-Medium.otf', 14);
+local DEFAULT_FONT = love.graphics.newFont(12);
 
 -- ------------------------------------------------
 -- Local Variables
@@ -54,48 +61,61 @@ end
 -- ------------------------------------------------
 
 ---
--- Draws a list of all authors working on the project.
---
-function FileManager.draw()
-    local count = 0;
-    love.graphics.print(totalFiles, love.graphics.getWidth() - 120, 20);
-    love.graphics.print('Files', love.graphics.getWidth() - 80, 20);
-    for ext, tbl in pairs(extensions) do
-        count = count + 1;
-        love.graphics.setColor(tbl.color);
-        love.graphics.print(ext, love.graphics.getWidth() - 80, 20 + count * 20);
-        love.graphics.print(tbl.amount, love.graphics.getWidth() - 120, 20 + count * 20);
-        love.graphics.setColor(255, 255, 255);
-    end
-end
-
----
 -- Adds a new file extension to the list.
 -- @param fileName
 --
-function FileManager.add(fileName)
+function ExtensionHandler.add(fileName)
     local ext = splitExtension(fileName);
     if not extensions[ext] then
         extensions[ext] = {};
-        extensions[ext].amount = 0;
+        extensions[ext].count = 0;
         extensions[ext].color = colors[ext] or { love.math.random(0, 255), love.math.random(0, 255), love.math.random(0, 255) };
     end
-    extensions[ext].amount = extensions[ext].amount + 1;
+    extensions[ext].count = extensions[ext].count + 1;
     totalFiles = totalFiles + 1;
 
     return extensions[ext].color;
 end
 
-function FileManager.reset()
+function ExtensionHandler.reset()
     extensions = {};
     totalFiles = 0;
+end
+
+function ExtensionHandler.createCanvas()
+    local toSort = {};
+    for ext, tbl in pairs(extensions) do
+        toSort[#toSort + 1] = { count = tbl.count, color = tbl.color, extension = ext };
+    end
+    table.sort(toSort, function(a, b)
+        return a.count > b.count;
+    end)
+
+    local width = 150;
+    local height = 20 + #toSort * 20;
+
+    local canvas = love.graphics.newCanvas(width, height);
+    canvas:renderTo(function()
+        love.graphics.setBlendMode('premultiplied');
+        love.graphics.setFont(LIST_FONT);
+        love.graphics.print(string.format('%5.d %s', totalFiles, 'Files', 0, 20));
+        for i = 1, #toSort do
+            love.graphics.setColor(toSort[i].color);
+            love.graphics.print(string.format('%5.d %s', toSort[i].count, toSort[i].extension), 0, i * 20);
+            love.graphics.setColor(255, 255, 255);
+        end
+        love.graphics.setBlendMode('alpha');
+        love.graphics.setFont(DEFAULT_FONT);
+    end);
+
+    return canvas;
 end
 
 -- ------------------------------------------------
 -- Setters
 -- ------------------------------------------------
 
-function FileManager.setColorTable(cltbl)
+function ExtensionHandler.setColorTable(cltbl)
     colors = cltbl;
 end
 
@@ -106,7 +126,7 @@ end
 ---
 -- @param ext
 --
-function FileManager.getColor(ext)
+function ExtensionHandler.getColor(ext)
     return extensions[ext].color;
 end
 
@@ -114,4 +134,4 @@ end
 -- Return Module
 -- ------------------------------------------------
 
-return FileManager;
+return ExtensionHandler;

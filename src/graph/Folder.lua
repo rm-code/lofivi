@@ -28,11 +28,14 @@ local Folder = {};
 
 local FORCE_MAX = 4;
 
+local LABEL_FONT = love.graphics.newFont(25);
+local DEFAULT_FONT = love.graphics.newFont(12);
+
 -- ------------------------------------------------
 -- Constructor
 -- ------------------------------------------------
 
-function Folder.new(parent, name, x, y)
+function Folder.new(spriteBatch, parent, name, x, y)
     local self = {};
 
     local files = {};
@@ -44,6 +47,8 @@ function Folder.new(parent, name, x, y)
     local px, py = x, y; -- Position.
     local vx, vy = 0, 0; -- Velocity.
     local ax, ay = 0, 0; -- Acceleration.
+
+    local radius = 0;
 
     -- ------------------------------------------------
     -- Private Functions
@@ -134,38 +139,43 @@ function Folder.new(parent, name, x, y)
             local y = (layers[layer].radius * math.sin((angle * (fileCounter - 1)) * (math.pi / 180)));
             file:setOffset(x, y);
         end
+        return layers[layer].radius;
     end
 
     -- ------------------------------------------------
     -- Public Functions
     -- ------------------------------------------------
 
-    function self:draw()
+    function self:draw(showLabels)
         love.graphics.circle('fill', px, py, 2, 10);
-        love.graphics.setColor(255, 255, 255, 35);
-        love.graphics.print(name, px + 5, py + 5);
-        love.graphics.setColor(255, 255, 255, 255);
-        for _, file in pairs(files) do
-            file:draw();
+
+        if showLabels then
+            love.graphics.setFont(LABEL_FONT);
+            love.graphics.setColor(255, 255, 255, 105);
+            love.graphics.print(name, px + 10 + radius, py + 10);
+            love.graphics.setColor(255, 255, 255, 255);
+            love.graphics.setFont(DEFAULT_FONT);
         end
+
         for _, node in pairs(children) do
             love.graphics.setColor(255, 255, 255, 55);
             love.graphics.line(px, py, node:getX(), node:getY());
             love.graphics.setColor(255, 255, 255, 255);
-            node:draw();
+            node:draw(showLabels);
         end
     end
 
     function self:update(dt)
         for _, file in pairs(files) do
-            file:setParentPosition(px, py);
+            spriteBatch:setColor(file:getColor());
+            spriteBatch:add(px + file:getOffsetX(), py + file:getOffsetY(), 0, 1, 1, 10,10);
         end
     end
 
     function self:addFile(name, file)
         files[name] = file;
         fileCount = fileCount + 1;
-        plotCircle(files, fileCount);
+        radius = plotCircle(files, fileCount);
     end
 
     function self:addChild(name, folder)

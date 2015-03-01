@@ -29,18 +29,7 @@ local File = {};
 function File.new(name, color)
     local self = {};
 
-    local px, py;
     local ox, oy;
-
-    -- ------------------------------------------------
-    -- Public Functions
-    -- ------------------------------------------------
-
-    function self:draw()
-        love.graphics.setColor(color);
-        love.graphics.circle('line', px + ox, py + oy, 5, 20);
-        love.graphics.setColor(255, 255, 255, 255);
-    end
 
     -- ------------------------------------------------
     -- Setters
@@ -50,8 +39,20 @@ function File.new(name, color)
         ox, oy = nox, noy;
     end
 
-    function self:setParentPosition(nx, ny)
-        px, py = nx, ny;
+    -- ------------------------------------------------
+    -- Getters
+    -- ------------------------------------------------
+
+    function self:getOffsetX()
+        return ox;
+    end
+
+    function self:getOffsetY()
+        return oy;
+    end
+
+    function self:getColor()
+        return color;
     end
 
     return self;

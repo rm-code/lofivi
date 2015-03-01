@@ -34,12 +34,20 @@ local Graph = {};
 -- Constructor
 -- ------------------------------------------------
 
-function Graph.new()
+function Graph.new(showLabels)
     local self = {};
 
     local tree;
     local nodes;
     local minX, maxX, minY, maxY;
+
+    local showLabels = showLabels;
+
+    local sprite = love.graphics.newCanvas(20, 20, 'normal', 16);
+    sprite:renderTo(function()
+        love.graphics.circle('fill', 10, 10, 7, 30);
+    end);
+    local spritebatch = love.graphics.newSpriteBatch(sprite, 10000, 'stream');
 
     -- ------------------------------------------------
     -- Private Functions
@@ -66,17 +74,24 @@ function Graph.new()
     -- @param paths
     --
     local function createGraph(paths)
-        local nodes = { Folder.new(nil, 'root', love.graphics.getWidth() * 0.5, love.graphics.getHeight() * 0.5) };
+        local nodes = { Folder.new(spritebatch, nil, 'root', love.graphics.getWidth() * 0.5, love.graphics.getHeight() * 0.5) };
         local tree = nodes[#nodes];
 
         for i = 1, #paths do
             local target;
 
             -- Split the path using pattern matching.
-            for name in paths[i]:gmatch('[^/]+') do
+            local splitPath = {};
+            for part in paths[i]:gmatch('[^/]+') do
+                splitPath[#splitPath + 1] = part;
+            end
+
+            -- Iterate over the split parts and create folders and files.
+            for i = 1, #splitPath do
+                local name = splitPath[i];
                 if name == 'root' then
                     target = nodes[1];
-                elseif name:find('%.') then
+                elseif i == #splitPath then
                     local col = ExtensionHandler.add(name); -- Get a colour for this file.
                     target:addFile(name, File.new(name, col));
                 else
@@ -87,7 +102,7 @@ function Graph.new()
                         local ox = love.math.random(5, 40) * (love.math.random(0, 1) == 0 and -1 or 1);
                         local oy = love.math.random(5, 40) * (love.math.random(0, 1) == 0 and -1 or 1);
 
-                        nodes[#nodes + 1] = Folder.new(target, name, target:getX() + ox, target:getY() + oy);
+                        nodes[#nodes + 1] = Folder.new(spritebatch, target, name, target:getX() + ox, target:getY() + oy);
                         target = target:addChild(name, nodes[#nodes]);
                     else
                         target = nt;
@@ -109,10 +124,13 @@ function Graph.new()
     end
 
     function self:draw()
-        tree:draw();
+        tree:draw(showLabels);
+        love.graphics.draw(spritebatch);
     end
 
     function self:update(dt)
+        minX, maxX, minY, maxY = tree:getX(), tree:getX(), tree:getY(), tree:getY();
+        spritebatch:clear();
         for i = 1, #nodes do
             local nodeA = nodes[i];
             for j = 1, #nodes do
@@ -130,6 +148,10 @@ function Graph.new()
             local nx, ny = nodeA:move(dt);
             minX, maxX, minY, maxY = updateBoundaries(minX, maxX, minY, maxY, nx, ny);
         end
+    end
+
+    function self:toggleLabels()
+        showLabels = not showLabels;
     end
 
     function self:getCenter()

@@ -27,12 +27,20 @@ function Camera.new()
 
     local px, py = 0, 0;
     local scale = 1;
+    local angle = 0;
 
     function self:set()
         love.graphics.push();
+        local width = love.graphics.getWidth();
+        local height = love.graphics.getHeight();
+
         love.graphics.scale(scale, scale);
         love.graphics.translate(-px, -py);
-        love.graphics.translate(love.graphics.getWidth() / (2 * scale), love.graphics.getHeight() / (2 * scale));
+        love.graphics.translate(width / (2 * scale), height / (2 * scale));
+
+        love.graphics.translate(width / 2, height / 2);
+        love.graphics.rotate(angle);
+        love.graphics.translate(-width / 2, -height / 2);
     end
 
     function self:unset()
@@ -46,6 +54,10 @@ function Camera.new()
 
     function self:zoom(factor, dt)
         scale = scale + factor * dt;
+    end
+
+    function self:rotate(da, dt)
+        angle = angle + da * dt;
     end
 
     return self;
