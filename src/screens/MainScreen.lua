@@ -196,6 +196,11 @@ function MainScreen.new()
         elseif love.keyboard.isDown('right') then
             ox = ox + dt * CAMERA_SPEED;
         end
+        if love.keyboard.isDown('a') then
+            camera:rotate(0.6, dt);
+        elseif love.keyboard.isDown('d') then
+            camera:rotate(-0.6, dt);
+        end
 
         cx, cy = graph:getCenter();
         camera:track(cx + ox, cy + oy, 2, dt);
