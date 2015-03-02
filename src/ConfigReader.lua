@@ -56,6 +56,7 @@ return {
             take_screenshot = ' ', -- Take a screenshot
             toggleLabels =    '1', -- Hide / Show labels
             toggleFileList =  '2', -- Hide / Show file list
+            toggleFullscreen = 'f', -- Toggle fullscreen
         },
     },
 

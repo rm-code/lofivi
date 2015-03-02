@@ -63,6 +63,7 @@ local graph_reset;
 local take_screenshot;
 local toggleLabels;
 local toggleFileList;
+local toggleFullscreen;
 
 -- ------------------------------------------------
 -- Constructor
@@ -215,6 +216,7 @@ function MainScreen.new()
         take_screenshot = config.options.keyBindings.take_screenshot;
         toggleLabels = config.options.keyBindings.toggleLabels;
         toggleFileList = config.options.keyBindings.toggleFileList;
+        toggleFullscreen = config.options.keyBindings.toggleFullscreen;
 
         -- Create the camera.
         camera = Camera.new();
@@ -293,6 +295,8 @@ function MainScreen.new()
             graph:toggleLabels()
         elseif key == toggleFileList then
             visible = not visible;
+        elseif key == toggleFullscreen then
+            love.window.setFullscreen(not love.window.getFullscreen());
         end
     end
 
