@@ -195,6 +195,10 @@ function MainScreen.new()
 
         -- Load configuration file and set options.
         config = ConfigReader.init();
+        love.window.setMode(config.options.screenW, config.options.screenH, {
+            fullscreen = config.options.fullscreen,
+            fullscreentype = config.options.fsType,
+        });
         love.graphics.setBackgroundColor(config.options.bgColor);
         ExtensionHandler.setColorTable(config.fileColors);
 
