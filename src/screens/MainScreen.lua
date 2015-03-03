@@ -175,6 +175,23 @@ function MainScreen.new()
         screenshot:encode('screenshots/' .. os.time() .. '.png');
     end
 
+    ---
+    -- Creates the panel containing the sorted list of file extensions.
+    --
+    local function createPanel()
+        local canvas = ExtensionHandler.createCanvas();
+        local panel = Panel.new(love.graphics.getWidth() - canvas:getWidth(), 0, canvas:getWidth(), canvas:getHeight() + 20);
+        panel:setContent(canvas);
+        return panel;
+    end
+
+    ---
+    -- Creates a list of paths of all files in the root directory and ignores
+    -- paths based on the ignore list specified in the config file.
+    -- It then proceeds to generate the graph based on the files and folders.
+    -- @param path
+    -- @param config
+    --
     local function createGraph(path, config)
         -- Read the files and folders and checks if some of them will be ignored.
         local pathsList = ignoreFiles(recursivelyGetDirectoryItems(path), config.ignore);
@@ -183,11 +200,7 @@ function MainScreen.new()
         local graph = Graph.new(config.options.showLabels);
         graph:init(pathsList);
 
-        local canvas = ExtensionHandler.createCanvas();
-        local panel = Panel.new(love.graphics.getWidth() - canvas:getWidth(), 0, canvas:getWidth(), canvas:getHeight() + 20);
-        panel:setContent(canvas);
-
-        return graph, panel;
+        return graph;
     end
 
     ---
@@ -263,7 +276,8 @@ function MainScreen.new()
         camera = Camera.new();
         ox, oy = 0, 0; -- Camera offset.
 
-        graph, panel = createGraph('root', config);
+        graph = createGraph('root', config);
+        panel = createPanel();
         visible = config.options.showFileList;
     end
 
@@ -306,7 +320,8 @@ function MainScreen.new()
     function self:keypressed(key)
         if key == graph_reset then
             ExtensionHandler.reset();
-            graph, panel = createGraph('root', config);
+            graph = createGraph('root', config);
+            panel = createPanel();
         elseif key == take_screenshot then
             createScreenshot();
         elseif key == toggleLabels then
