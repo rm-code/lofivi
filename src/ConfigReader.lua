@@ -38,33 +38,33 @@ return {
         showLabels = false,
         showFileList = true,
 
-        fullscreen = true,         -- Toggle fullscreen
-        fsType = 'desktop',        -- FullscreenMode ('normal' or 'desktop')
+        fullscreen = true,      -- Toggle fullscreen
+        fsType = 'desktop',     -- FullscreenMode ('normal' or 'desktop')
         screenW = 0,
         screenH = 0,
 
-        logo = 'logo.png',         -- A custom logo to load.
-        logoPosX = 10,             -- The logo's screen-position.
+        logo = 'logo.png',      -- A custom logo to load.
+        logoPosX = 10,          -- The logo's screen-position.
         logoPosY = 10,
-        logoScaleX = 1,            -- The logo's scale.
+        logoScaleX = 1,         -- The logo's scale.
         logoScaleY = 1,
+    },
 
-        -- See https://love2d.org/wiki/KeyConstant for a list of possible keycodes.
-        keyBindings = {
-            camera_n =         'w', -- Move camera up
-            camera_w =         'a', -- Move camera left
-            camera_s =         's', -- Move camera down
-            camera_e =         'd', -- Move camera right
-            camera_rotateL =   'q', -- Rotate camera left
-            camera_rotateR =   'e', -- Rotate camera right
-            camera_zoomIn =    '+', -- Zoom in
-            camera_zoomOut =   '-', -- Zoom out
-            graph_reset =      'r', -- Reloads the whole graph
-            take_screenshot =  ' ', -- Take a screenshot
-            toggleLabels =     '1', -- Hide / Show labels
-            toggleFileList =   '2', -- Hide / Show file list
-            toggleFullscreen = 'f', -- Toggle fullscreen
-        },
+    -- See https://love2d.org/wiki/KeyConstant for a list of possible keycodes.
+    keyBindings = {
+        camera_n =         'w', -- Move camera up
+        camera_w =         'a', -- Move camera left
+        camera_s =         's', -- Move camera down
+        camera_e =         'd', -- Move camera right
+        camera_rotateL =   'q', -- Rotate camera left
+        camera_rotateR =   'e', -- Rotate camera right
+        camera_zoomIn =    '+', -- Zoom in
+        camera_zoomOut =   '-', -- Zoom out
+        graph_reset =      'r', -- Reloads the whole graph
+        take_screenshot =  ' ', -- Take a screenshot
+        toggleLabels =     '1', -- Hide / Show labels
+        toggleFileList =   '2', -- Hide / Show file list
+        toggleFullscreen = 'f', -- Toggle fullscreen
     },
 
     -- Can be used to assign a specific color to a file extension (RGB or RGBA).

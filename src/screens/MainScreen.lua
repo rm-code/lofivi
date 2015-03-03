@@ -261,19 +261,19 @@ function MainScreen.new()
         ExtensionHandler.setColorTable(config.fileColors);
 
         -- Load key bindings.
-        camera_zoomIn = config.options.keyBindings.camera_zoomIn;
-        camera_zoomOut = config.options.keyBindings.camera_zoomOut;
-        camera_rotateL = config.options.keyBindings.camera_rotateL;
-        camera_rotateR = config.options.keyBindings.camera_rotateR;
-        camera_n = config.options.keyBindings.camera_n;
-        camera_s = config.options.keyBindings.camera_s;
-        camera_e = config.options.keyBindings.camera_e;
-        camera_w = config.options.keyBindings.camera_w;
-        graph_reset = config.options.keyBindings.graph_reset;
-        take_screenshot = config.options.keyBindings.take_screenshot;
-        toggleLabels = config.options.keyBindings.toggleLabels;
-        toggleFileList = config.options.keyBindings.toggleFileList;
-        toggleFullscreen = config.options.keyBindings.toggleFullscreen;
+        camera_zoomIn = config.keyBindings.camera_zoomIn;
+        camera_zoomOut = config.keyBindings.camera_zoomOut;
+        camera_rotateL = config.keyBindings.camera_rotateL;
+        camera_rotateR = config.keyBindings.camera_rotateR;
+        camera_n = config.keyBindings.camera_n;
+        camera_s = config.keyBindings.camera_s;
+        camera_e = config.keyBindings.camera_e;
+        camera_w = config.keyBindings.camera_w;
+        graph_reset = config.keyBindings.graph_reset;
+        take_screenshot = config.keyBindings.take_screenshot;
+        toggleLabels = config.keyBindings.toggleLabels;
+        toggleFileList = config.keyBindings.toggleFileList;
+        toggleFullscreen = config.keyBindings.toggleFullscreen;
 
         -- Create the camera.
         camera = Camera.new();
