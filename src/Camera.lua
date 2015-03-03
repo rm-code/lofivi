@@ -53,7 +53,7 @@ function Camera.new()
     end
 
     function self:zoom(factor, dt)
-        scale = scale + factor * dt;
+        scale = math.max(0.05, math.min(scale + factor * dt, 2));
     end
 
     function self:rotate(da, dt)
