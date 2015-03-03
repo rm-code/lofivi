@@ -37,10 +37,17 @@ return {
         bgColor = { 0, 0, 0 },
         showLabels = false,
         showFileList = true,
+
         fullscreen = true,         -- Toggle fullscreen
         fsType = 'desktop',        -- FullscreenMode ('normal' or 'desktop')
         screenW = 0,
         screenH = 0,
+
+        logo = 'logo.png',         -- A custom logo to load.
+        logoPosX = 10,             -- The logo's screen-position.
+        logoPosY = 10,
+        logoScaleX = 1,            -- The logo's scale.
+        logoScaleY = 1,
 
         -- See https://love2d.org/wiki/KeyConstant for a list of possible keycodes.
         keyBindings = {

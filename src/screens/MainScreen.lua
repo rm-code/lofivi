@@ -26,6 +26,7 @@ local Graph = require('src/graph/Graph');
 local Camera = require('src/Camera');
 local ConfigReader = require('src/ConfigReader');
 local Panel = require('src/Panel');
+local Logo = require('src/Logo');
 
 -- ------------------------------------------------
 -- Module
@@ -91,6 +92,8 @@ function MainScreen.new()
     local resize = false;
     local drag = false;
     local scroll = false;
+
+    local logo;
 
     -- ------------------------------------------------
     -- Private Functions
@@ -279,6 +282,13 @@ function MainScreen.new()
         graph = createGraph('root', config);
         panel = createPanel();
         visible = config.options.showFileList;
+
+        -- Load a logo according to the config file.
+        logo = Logo.new(config.options.logo,
+            config.options.logoPosX,
+            config.options.logoPosY,
+            config.options.logoScaleX,
+            config.options.logoScaleY);
     end
 
     function self:draw()
@@ -289,6 +299,8 @@ function MainScreen.new()
         if visible then
             panel:draw();
         end
+
+        logo:draw();
     end
 
     function self:update(dt)
