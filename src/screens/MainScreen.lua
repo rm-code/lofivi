@@ -44,7 +44,11 @@ After you have placed it there you can use the R-Key to regenerate the graph.
 
 LoFiVi will now open the file directory in which to place the folder.
 ]];
-local CAMERA_SPEED = 400;
+
+local CAMERA_ROTATION_SPEED = 0.6;
+local CAMERA_TRANSLATION_SPEED = 400;
+local CAMERA_TRACKING_SPEED = 2;
+local CAMERA_ZOOM_SPEED = 0.6;
 
 -- ------------------------------------------------
 -- Controls
@@ -186,6 +190,43 @@ function MainScreen.new()
         return graph, panel;
     end
 
+    ---
+    -- Processes camera related controls and updates the camera.
+    -- @param ox - The current offset of the camera on the x-axis.
+    -- @param oy - The current offset of the camera on the y-axis.
+    -- @param dt
+    --
+    local function updateCamera(ox, oy, dt)
+        -- Zoom.
+        if love.keyboard.isDown(camera_zoomIn) then
+            camera:zoom(CAMERA_ZOOM_SPEED, dt);
+        elseif love.keyboard.isDown(camera_zoomOut) then
+            camera:zoom(-CAMERA_ZOOM_SPEED, dt);
+        end
+        -- Rotation.
+        if love.keyboard.isDown(camera_rotateL) then
+            camera:rotate(CAMERA_ROTATION_SPEED, dt);
+        elseif love.keyboard.isDown(camera_rotateR) then
+            camera:rotate(-CAMERA_ROTATION_SPEED, dt);
+        end
+        -- Movement.
+        if love.keyboard.isDown(camera_n) then
+            oy = oy - dt * CAMERA_TRANSLATION_SPEED;
+        elseif love.keyboard.isDown(camera_s) then
+            oy = oy + dt * CAMERA_TRANSLATION_SPEED;
+        end
+        if love.keyboard.isDown(camera_w) then
+            ox = ox - dt * CAMERA_TRANSLATION_SPEED;
+        elseif love.keyboard.isDown(camera_e) then
+            ox = ox + dt * CAMERA_TRANSLATION_SPEED;
+        end
+
+        local cx, cy = graph:getCenter();
+        camera:track(cx + ox, cy + oy, CAMERA_TRACKING_SPEED, dt);
+
+        return ox, oy;
+    end
+
     -- ------------------------------------------------
     -- Public Functions
     -- ------------------------------------------------
@@ -220,7 +261,6 @@ function MainScreen.new()
 
         -- Create the camera.
         camera = Camera.new();
-        cx, cy = 0, 0; -- Camera tracking position.
         ox, oy = 0, 0; -- Camera offset.
 
         graph, panel = createGraph('root', config);
@@ -260,29 +300,7 @@ function MainScreen.new()
             panel:setPosition(love.mouse.getX(), love.mouse.getY());
         end
 
-        if love.keyboard.isDown(camera_zoomIn) then
-            camera:zoom(0.6, dt);
-        elseif love.keyboard.isDown(camera_zoomOut) then
-            camera:zoom(-0.6, dt);
-        end
-        if love.keyboard.isDown(camera_n) then
-            oy = oy - dt * CAMERA_SPEED;
-        elseif love.keyboard.isDown(camera_s) then
-            oy = oy + dt * CAMERA_SPEED;
-        end
-        if love.keyboard.isDown(camera_w) then
-            ox = ox - dt * CAMERA_SPEED;
-        elseif love.keyboard.isDown(camera_e) then
-            ox = ox + dt * CAMERA_SPEED;
-        end
-        if love.keyboard.isDown(camera_rotateL) then
-            camera:rotate(0.6, dt);
-        elseif love.keyboard.isDown(camera_rotateR) then
-            camera:rotate(-0.6, dt);
-        end
-
-        cx, cy = graph:getCenter();
-        camera:track(cx + ox, cy + oy, 2, dt);
+        ox, oy = updateCamera(ox, oy, dt);
     end
 
     function self:keypressed(key)
