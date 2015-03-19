@@ -80,7 +80,6 @@ function MainScreen.new()
     local camera;
     local config;
     local graph;
-    local cx, cy;
     local ox, oy;
 
     local panel;
