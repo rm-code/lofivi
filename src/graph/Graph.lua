@@ -154,10 +154,6 @@ function Graph.new(showLabels)
         showLabels = not showLabels;
     end
 
-    function self:getCenter()
-        return minX + (maxX - minX) * 0.5, minY + (maxY - minY) * 0.5;
-    end
-
     function self:grab(x, y)
         for i = 1, #nodes do
             local node = nodes[i];
@@ -169,6 +165,14 @@ function Graph.new(showLabels)
                 return node;
             end
         end
+    end
+
+    -- ------------------------------------------------
+    -- Getters
+    -- ------------------------------------------------
+
+    function self:getCenter()
+        return minX + (maxX - minX) * 0.5, minY + (maxY - minY) * 0.5;
     end
 
     return self;
