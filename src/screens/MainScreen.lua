@@ -50,6 +50,8 @@ local CAMERA_ROTATION_SPEED = 0.6;
 local CAMERA_TRANSLATION_SPEED = 400;
 local CAMERA_TRACKING_SPEED = 2;
 local CAMERA_ZOOM_SPEED = 0.6;
+local CAMERA_MAX_ZOOM = 0.05;
+local CAMERA_MIN_ZOOM = 2;
 
 -- ------------------------------------------------
 -- Controls
@@ -222,6 +224,7 @@ function MainScreen.new()
         elseif love.keyboard.isDown(camera_zoomOut) then
             zoom = zoom - CAMERA_ZOOM_SPEED * dt;
         end
+        zoom = math.max(CAMERA_MAX_ZOOM, math.min(zoom, CAMERA_MIN_ZOOM));
         camera:zoomTo(zoom);
 
         -- Rotation.
