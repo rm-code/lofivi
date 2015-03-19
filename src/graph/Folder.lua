@@ -119,10 +119,20 @@ function Folder.new(spriteBatch, parent, name, x, y)
         -- Get a blueprint of how the file nodes need to be distributed amongst different layers.
         local layers = createOnionLayers(count);
 
+        -- Sort files based on their extension before placing them.
+        local toSort = {};
+        for _, file in pairs(files) do
+            toSort[#toSort + 1] = { extension = file:getExtension(), file = file };
+        end
+        table.sort(toSort, function(a, b)
+            return a.extension > b.extension;
+        end)
+
         -- Update the position of the file nodes based on the previously calculated onion-layers.
         local fileCounter = 0;
         local layer = 1;
-        for _, file in pairs(files) do
+        for i = 1, #toSort do
+            local file = toSort[i].file;
             fileCounter = fileCounter + 1;
 
             -- If we have more files on the current layer than allowed, we "move"

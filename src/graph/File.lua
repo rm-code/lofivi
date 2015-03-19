@@ -26,7 +26,7 @@ local File = {};
 -- Constructor
 -- ------------------------------------------------
 
-function File.new(name, color)
+function File.new(extension, color)
     local self = {};
 
     local ox, oy;
@@ -53,6 +53,10 @@ function File.new(name, color)
 
     function self:getColor()
         return color;
+    end
+
+    function self:getExtension()
+        return extension;
     end
 
     return self;

@@ -92,8 +92,8 @@ function Graph.new(showLabels)
                 if name == 'root' then
                     target = nodes[1];
                 elseif i == #splitPath then
-                    local col = ExtensionHandler.add(name); -- Get a colour for this file.
-                    target:addFile(name, File.new(name, col));
+                    local col, ext = ExtensionHandler.add(name); -- Get a colour for this file.
+                    target:addFile(name, File.new(ext, col));
                 else
                     -- Get the next folder as a target. If that folder doesn't exist in our graph yet, create it first.
                     local nt = target:getChild(name);

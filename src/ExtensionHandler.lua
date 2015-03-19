@@ -74,7 +74,7 @@ function ExtensionHandler.add(fileName)
     extensions[ext].count = extensions[ext].count + 1;
     totalFiles = totalFiles + 1;
 
-    return extensions[ext].color;
+    return extensions[ext].color, ext;
 end
 
 function ExtensionHandler.reset()
