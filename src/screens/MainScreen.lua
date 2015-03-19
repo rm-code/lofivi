@@ -25,8 +25,8 @@ local ExtensionHandler = require('src/ExtensionHandler');
 local Graph = require('src/graph/Graph');
 local Camera = require('lib/camera/Camera');
 local ConfigReader = require('src/ConfigReader');
-local Panel = require('src/Panel');
-local Logo = require('src/Logo');
+local Panel = require('src/ui/Panel');
+local Logo = require('src/ui/Logo');
 
 -- ------------------------------------------------
 -- Module
