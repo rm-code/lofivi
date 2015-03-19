@@ -89,8 +89,6 @@ function MainScreen.new()
     local panel;
     local visible;
 
-    local pmy = 0; -- Previous position of the mouse on the y-axis.
-    local dmy = 0; -- Delta movement of the mouse between updates on the y-axis.
     local clickTime = 0;
     local resize = false;
     local drag = false;
@@ -332,18 +330,9 @@ function MainScreen.new()
             grabbedNode:setPosition(camera:worldCoords(love.mouse.getPosition()));
         end
 
-        -- Update relative mouse events.
+        -- Update timer for detecting double clicks.
         clickTime = math.min(1.0, clickTime + dt);
-        if love.mouse.getY() ~= pmy then
-            dmy = pmy - love.mouse.getY();
-            pmy = love.mouse.getY();
-        else
-            dmy = 0;
-        end
 
-        if scroll then
-            panel:scroll(0, -dmy);
-        end
         if resize then
             panel:resize(love.mouse.getX(), love.mouse.getY());
         end
@@ -399,6 +388,12 @@ function MainScreen.new()
         resize = false;
         drag = false;
         scroll = false;
+    end
+
+    function self:mousemoved(x, y, dx, dy)
+        if scroll then
+            panel:scroll(0, dy);
+        end
     end
 
     return self;
