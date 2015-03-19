@@ -168,7 +168,7 @@ function Folder.new(spriteBatch, parent, name, x, y)
     function self:update(dt)
         for _, file in pairs(files) do
             spriteBatch:setColor(file:getColor());
-            spriteBatch:add(px + file:getOffsetX(), py + file:getOffsetY(), 0, 1, 1, 10,10);
+            spriteBatch:add(px + file:getOffsetX(), py + file:getOffsetY(), 0, 1, 1, 10, 10);
         end
     end
 
