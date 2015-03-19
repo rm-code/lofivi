@@ -23,7 +23,7 @@
 local Screen = require('lib/screenmanager/Screen');
 local ExtensionHandler = require('src/ExtensionHandler');
 local Graph = require('src/graph/Graph');
-local Camera = require('src/Camera');
+local Camera = require('lib/camera/Camera');
 local ConfigReader = require('src/ConfigReader');
 local Panel = require('src/Panel');
 local Logo = require('src/Logo');
@@ -80,7 +80,9 @@ function MainScreen.new()
     local camera;
     local config;
     local graph;
+    local camX, camY;
     local ox, oy;
+    local zoom = 1;
 
     local panel;
     local visible;
@@ -214,30 +216,43 @@ function MainScreen.new()
     local function updateCamera(ox, oy, dt)
         -- Zoom.
         if love.keyboard.isDown(camera_zoomIn) then
-            camera:zoom(CAMERA_ZOOM_SPEED, dt);
+            zoom = zoom + CAMERA_ZOOM_SPEED * dt;
         elseif love.keyboard.isDown(camera_zoomOut) then
-            camera:zoom(-CAMERA_ZOOM_SPEED, dt);
+            zoom = zoom - CAMERA_ZOOM_SPEED * dt;
         end
+        camera:zoomTo(zoom);
+
         -- Rotation.
         if love.keyboard.isDown(camera_rotateL) then
-            camera:rotate(CAMERA_ROTATION_SPEED, dt);
+            camera:rotate(CAMERA_ROTATION_SPEED * dt);
         elseif love.keyboard.isDown(camera_rotateR) then
-            camera:rotate(-CAMERA_ROTATION_SPEED, dt);
-        end
-        -- Movement.
-        if love.keyboard.isDown(camera_n) then
-            oy = oy - dt * CAMERA_TRANSLATION_SPEED;
-        elseif love.keyboard.isDown(camera_s) then
-            oy = oy + dt * CAMERA_TRANSLATION_SPEED;
-        end
-        if love.keyboard.isDown(camera_w) then
-            ox = ox - dt * CAMERA_TRANSLATION_SPEED;
-        elseif love.keyboard.isDown(camera_e) then
-            ox = ox + dt * CAMERA_TRANSLATION_SPEED;
+            camera:rotate(-CAMERA_ROTATION_SPEED * dt);
         end
 
+        -- Horizontal Movement.
+        local dx = 0;
+        if love.keyboard.isDown(camera_w) then
+            dx = dx - dt * CAMERA_TRANSLATION_SPEED;
+        elseif love.keyboard.isDown(camera_e) then
+            dx = dx + dt * CAMERA_TRANSLATION_SPEED;
+        end
+        -- Vertical Movement.
+        local dy = 0;
+        if love.keyboard.isDown(camera_n) then
+            dy = dy - dt * CAMERA_TRANSLATION_SPEED;
+        elseif love.keyboard.isDown(camera_s) then
+            dy = dy + dt * CAMERA_TRANSLATION_SPEED;
+        end
+
+        -- Take the camera rotation into account when calculating the new offset.
+        ox = ox + (math.cos(-camera.rot) * dx - math.sin(-camera.rot) * dy);
+        oy = oy + (math.sin(-camera.rot) * dx + math.cos(-camera.rot) * dy);
+
+        -- Gradually move the camera to the target position.
         local cx, cy = graph:getCenter();
-        camera:track(cx + ox, cy + oy, CAMERA_TRACKING_SPEED, dt);
+        camX = camX - (camX - math.floor(cx + ox)) * dt * CAMERA_TRACKING_SPEED;
+        camY = camY - (camY - math.floor(cy + oy)) * dt * CAMERA_TRACKING_SPEED;
+        camera:lookAt(camX, camY);
 
         return ox, oy;
     end
@@ -276,6 +291,7 @@ function MainScreen.new()
 
         -- Create the camera.
         camera = Camera.new();
+        camX, camY = 0, 0;
         ox, oy = 0, 0; -- Camera offset.
 
         graph = createGraph('root', config);
@@ -291,9 +307,9 @@ function MainScreen.new()
     end
 
     function self:draw()
-        camera:set();
-        graph:draw();
-        camera:unset();
+        camera:draw(function()
+            graph:draw();
+        end);
 
         if visible then
             panel:draw();
