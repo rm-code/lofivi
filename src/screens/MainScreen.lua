@@ -96,6 +96,8 @@ function MainScreen.new()
 
     local logo;
 
+    local grabbedNode;
+
     -- ------------------------------------------------
     -- Private Functions
     -- ------------------------------------------------
@@ -322,6 +324,11 @@ function MainScreen.new()
         graph:update(dt);
         panel:update(dt);
 
+        -- If the use has clicked on a node it will snap to the mouse position until released.
+        if grabbedNode then
+            grabbedNode:setPosition(camera:worldCoords(love.mouse.getPosition()));
+        end
+
         -- Update relative mouse events.
         clickTime = math.min(1.0, clickTime + dt);
         if love.mouse.getY() ~= pmy then
@@ -376,6 +383,12 @@ function MainScreen.new()
             clickTime = 0;
         else
             clickTime = 0;
+        end
+
+        if b == 'l' then
+            grabbedNode = graph:grab(camera:worldCoords(x, y));
+        elseif b == 'r' then
+            grabbedNode = nil;
         end
     end
 

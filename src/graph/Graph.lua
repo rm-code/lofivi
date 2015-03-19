@@ -158,6 +158,19 @@ function Graph.new(showLabels)
         return minX + (maxX - minX) * 0.5, minY + (maxY - minY) * 0.5;
     end
 
+    function self:grab(x, y)
+        for i = 1, #nodes do
+            local node = nodes[i];
+            local margin = 15;
+            if x < node:getX() + margin
+                    and x > node:getX() - margin
+                    and y < node:getY() + margin
+                    and y > node:getY() - margin then
+                return node;
+            end
+        end
+    end
+
     return self;
 end
 
