@@ -48,11 +48,17 @@ function Panel.new(x, y, w, h)
     local headerFocus = false;
     local cornerFocus = false;
 
+    local visible;
+
     -- ------------------------------------------------
     -- Public Functions
     -- ------------------------------------------------
 
     function self:draw()
+        if not visible then
+            return;
+        end
+
         love.graphics.setColor(255, 255, 255, contentFocus and 40 or 20);
         love.graphics.rectangle('fill', x + BORDER_SIZE, y + BORDER_SIZE, w - 2 * BORDER_SIZE, h - 2 * BORDER_SIZE);
 
@@ -129,6 +135,10 @@ function Panel.new(x, y, w, h)
         y = math.min(love.graphics.getHeight() - h, ny);
     end
 
+    function self:setVisible(nvisible)
+        visible = nvisible;
+    end
+
     -- ------------------------------------------------
     -- Getters
     -- ------------------------------------------------
@@ -143,6 +153,10 @@ function Panel.new(x, y, w, h)
 
     function self:hasHeaderFocus()
         return headerFocus;
+    end
+
+    function self:isVisible()
+        return visible;
     end
 
     return self;

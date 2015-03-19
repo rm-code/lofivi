@@ -86,14 +86,12 @@ function MainScreen.new()
     local ox, oy;
     local zoom = 1;
 
-    local panel;
-    local visible;
-
     local clickTime = 0;
     local resize = false;
     local drag = false;
     local scroll = false;
 
+    local panel;
     local logo;
 
     local grabbedNode;
@@ -299,7 +297,7 @@ function MainScreen.new()
 
         graph = createGraph('root', config);
         panel = createPanel();
-        visible = config.options.showFileList;
+        panel:setVisible(config.options.showFileList);
 
         -- Load a logo according to the config file.
         logo = Logo.new(config.options.logo,
@@ -314,10 +312,7 @@ function MainScreen.new()
             graph:draw();
         end);
 
-        if visible then
-            panel:draw();
-        end
-
+        panel:draw();
         logo:draw();
     end
 
@@ -353,7 +348,7 @@ function MainScreen.new()
         elseif key == toggleLabels then
             graph:toggleLabels()
         elseif key == toggleFileList then
-            visible = not visible;
+            panel:setVisible(not panel:isVisible());
         elseif key == toggleFullscreen then
             love.window.setFullscreen(not love.window.getFullscreen());
         end
