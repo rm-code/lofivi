@@ -43,10 +43,7 @@ function Graph.new(showLabels)
 
     local showLabels = showLabels;
 
-    local sprite = love.graphics.newCanvas(20, 20, 'normal', 16);
-    sprite:renderTo(function()
-        love.graphics.circle('fill', 10, 10, 7, 30);
-    end);
+    local sprite = love.graphics.newImage('res/img/node.png');
     local spritebatch = love.graphics.newSpriteBatch(sprite, 10000, 'stream');
 
     -- ------------------------------------------------

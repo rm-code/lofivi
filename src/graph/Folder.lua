@@ -31,6 +31,9 @@ local FORCE_MAX = 4;
 local LABEL_FONT = love.graphics.newFont(25);
 local DEFAULT_FONT = love.graphics.newFont(12);
 
+local SPRITE_SIZE = 0.45;
+local SPRITE_OFFSET = 15;
+
 -- ------------------------------------------------
 -- Constructor
 -- ------------------------------------------------
@@ -178,7 +181,7 @@ function Folder.new(spriteBatch, parent, name, x, y)
     function self:update(dt)
         for _, file in pairs(files) do
             spriteBatch:setColor(file:getColor());
-            spriteBatch:add(px + file:getOffsetX(), py + file:getOffsetY(), 0, 1, 1, 10, 10);
+            spriteBatch:add(px + file:getOffsetX(), py + file:getOffsetY(), 0, SPRITE_SIZE, SPRITE_SIZE, SPRITE_OFFSET, SPRITE_OFFSET);
         end
     end
 
