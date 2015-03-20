@@ -70,6 +70,7 @@ local graph_reset;
 local take_screenshot;
 local toggleLabels;
 local toggleFileList;
+local toggleLogo;
 local toggleFullscreen;
 
 -- ------------------------------------------------
@@ -288,6 +289,7 @@ function MainScreen.new()
         take_screenshot = config.keyBindings.take_screenshot;
         toggleLabels = config.keyBindings.toggleLabels;
         toggleFileList = config.keyBindings.toggleFileList;
+        toggleLogo = config.keyBindings.toggleLogo;
         toggleFullscreen = config.keyBindings.toggleFullscreen;
 
         -- Create the camera.
@@ -305,6 +307,7 @@ function MainScreen.new()
             config.options.logoPosY,
             config.options.logoScaleX,
             config.options.logoScaleY);
+        logo:setVisible(config.options.showLogo);
     end
 
     function self:draw()
@@ -349,6 +352,8 @@ function MainScreen.new()
             graph:toggleLabels()
         elseif key == toggleFileList then
             panel:setVisible(not panel:isVisible());
+        elseif key == toggleLogo then
+            logo:setVisible(not logo:isVisible());
         elseif key == toggleFullscreen then
             love.window.setFullscreen(not love.window.getFullscreen());
         end
