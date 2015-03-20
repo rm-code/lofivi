@@ -73,6 +73,7 @@ function Graph.new(showLabels)
     local function createGraph(paths)
         local nodes = { Folder.new(spritebatch, nil, 'root', love.graphics.getWidth() * 0.5, love.graphics.getHeight() * 0.5) };
         local tree = nodes[#nodes];
+        local fileCounter = 0;
 
         for i = 1, #paths do
             local target;
@@ -91,6 +92,7 @@ function Graph.new(showLabels)
                 elseif i == #splitPath then
                     local col, ext = ExtensionHandler.add(name); -- Get a colour for this file.
                     target:addFile(name, File.new(ext, col));
+                    fileCounter = fileCounter + 1;
                 else
                     -- Get the next folder as a target. If that folder doesn't exist in our graph yet, create it first.
                     local nt = target:getChild(name);
@@ -107,6 +109,8 @@ function Graph.new(showLabels)
                 end
             end
         end
+
+        print('Created ' .. #nodes .. ' folders and ' .. fileCounter .. ' files.');
 
         return tree, nodes;
     end
