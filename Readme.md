@@ -2,7 +2,7 @@
 
 LoFiVi uses a force-directed graph to visualise folder structures. 
 
-Check the [wiki](https://bitbucket.org/rmcode/lofivi/wiki/Home) for instructions and further information.
+Check the [wiki](https://github.com/rm-code/lofivi/wiki) for instructions and further information.
 
 ### License
 Copyright (C) 2015 by Robert Machmer                                                       
