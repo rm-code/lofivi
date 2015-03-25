@@ -211,7 +211,7 @@ function Folder.new(spriteBatch, parent, name, x, y)
     -- @param spring
     --
     function self:attract(nodeB, spring)
-        local dx, dy = self:getX() - nodeB:getX(), self:getY() - nodeB:getY();
+        local dx, dy = px - nodeB:getX(), py - nodeB:getY();
         local distance = math.sqrt(dx * dx + dy * dy);
 
         -- Normalise vector.
@@ -230,7 +230,7 @@ function Folder.new(spriteBatch, parent, name, x, y)
     --
     function self:repel(fileB, charge)
         -- Calculate distance vector.
-        local dx, dy = self:getX() - fileB:getX(), self:getY() - fileB:getY();
+        local dx, dy = px - fileB:getX(), py - fileB:getY();
         local distance = math.sqrt(dx * dx + dy * dy);
 
         -- Normalise vector.
