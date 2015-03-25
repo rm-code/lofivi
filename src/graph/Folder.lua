@@ -225,12 +225,12 @@ function Folder.new(spriteBatch, parent, name, x, y)
 
     ---
     -- Repels the node from nodeB.
-    -- @param fileB
+    -- @param nodeB
     -- @param charge
     --
-    function self:repel(fileB, charge)
+    function self:repel(nodeB, charge)
         -- Calculate distance vector.
-        local dx, dy = px - fileB:getX(), py - fileB:getY();
+        local dx, dy = px - nodeB:getX(), py - nodeB:getY();
         local distance = math.sqrt(dx * dx + dy * dy);
 
         -- Normalise vector.
@@ -238,7 +238,7 @@ function Folder.new(spriteBatch, parent, name, x, y)
         dy = dy / distance;
 
         -- Calculate force's strength and apply it to the vector.
-        local strength = charge * ((self:getMass() * fileB:getMass()) / (distance * distance));
+        local strength = charge * ((self:getMass() * nodeB:getMass()) / (distance * distance));
         dx = dx * strength;
         dy = dy * strength;
 
