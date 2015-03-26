@@ -95,13 +95,6 @@ function Panel.new(x, y, w, h)
             cornerFocus = x + w - BORDER_SIZE < mx and x + w > mx and y + h - BORDER_SIZE < my and y + h > my;
             headerFocus = x < mx and x + w > mx and y < my and y + BORDER_SIZE > my;
         end
-
-        if resize then
-            self:resize(mx, my);
-        end
-        if drag then
-            self:setPosition(mx - ox, my - oy);
-        end
     end
 
     ---
@@ -147,6 +140,17 @@ function Panel.new(x, y, w, h)
         drag = false;
         scroll = false;
         ox, oy = 0, 0;
+    end
+
+    function self:mousemoved(mx, my, dx, dy)
+        if drag then
+            self:setPosition(x + dx, y + dy);
+        elseif resize then
+            self:resize(mx, my);
+        elseif scroll then
+            contentOffsetX = contentOffsetX;
+            contentOffsetY = contentOffsetY + dy;
+        end
     end
 
     function self:doubleclick()

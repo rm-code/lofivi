@@ -373,7 +373,7 @@ function MainScreen.new()
     end
 
     function self:mousemoved(x, y, dx, dy)
-        panel:scroll(0, dy);
+        panel:mousemoved(x, y, dx, dy);
     end
 
     return self;
