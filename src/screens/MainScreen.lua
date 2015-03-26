@@ -88,9 +88,6 @@ function MainScreen.new()
     local zoom = 1;
 
     local clickTime = 0;
-    local resize = false;
-    local drag = false;
-    local scroll = false;
 
     local panel;
     local logo;
@@ -333,13 +330,6 @@ function MainScreen.new()
         -- Update timer for detecting double clicks.
         clickTime = math.min(1.0, clickTime + dt);
 
-        if resize then
-            panel:resize(love.mouse.getX(), love.mouse.getY());
-        end
-        if drag then
-            panel:setPosition(love.mouse.getX(), love.mouse.getY());
-        end
-
         ox, oy = updateCamera(ox, oy, dt);
     end
 
@@ -362,18 +352,10 @@ function MainScreen.new()
     end
 
     function self:mousepressed(x, y, b)
-        if panel:hasContentFocus() and b == 'l' then
-            scroll = true;
-        end
-        if panel:hasCornerFocus() and b == 'l' then
-            resize = true;
-        end
-        if panel:hasHeaderFocus() and b == 'l' then
-            drag = true;
-        end
+        panel:mousepressed(x, y, b);
 
-        if b == 'l' and clickTime < 0.5 and panel:hasContentFocus() then
-            panel:setContentPosition(0, 0);
+        if b == 'l' and clickTime < 0.5 then
+            panel:doubleclick();
             clickTime = 0;
         else
             clickTime = 0;
@@ -387,15 +369,11 @@ function MainScreen.new()
     end
 
     function self:mousereleased(x, y, b)
-        resize = false;
-        drag = false;
-        scroll = false;
+        panel:mousereleased(x, y, b);
     end
 
     function self:mousemoved(x, y, dx, dy)
-        if scroll then
-            panel:scroll(0, dy);
-        end
+        panel:scroll(0, dy);
     end
 
     return self;

@@ -44,9 +44,14 @@ function Panel.new(x, y, w, h)
 
     local content;
     local contentOffsetX, contentOffsetY = 0, 0;
+
     local contentFocus = false;
     local headerFocus = false;
     local cornerFocus = false;
+
+    local resize = false;
+    local scroll = false;
+    local drag = false;
 
     local visible;
 
@@ -84,6 +89,13 @@ function Panel.new(x, y, w, h)
         contentFocus = x + BORDER_SIZE < mx and x + w - BORDER_SIZE > mx and y + BORDER_SIZE < my and y + h - BORDER_SIZE > my;
         cornerFocus = x + w - BORDER_SIZE < mx and x + w > mx and y + h - BORDER_SIZE < my and y + h > my;
         headerFocus = x < mx and x + w > mx and y < my and y + BORDER_SIZE > my;
+
+        if resize then
+            self:resize(love.mouse.getX(), love.mouse.getY());
+        end
+        if drag then
+            self:setPosition(love.mouse.getX(), love.mouse.getY());
+        end
     end
 
     ---
@@ -92,8 +104,10 @@ function Panel.new(x, y, w, h)
     -- @param dy
     --
     function self:scroll(dx, dy)
-        contentOffsetX = contentOffsetX + dx;
-        contentOffsetY = contentOffsetY + dy;
+        if scroll then
+            contentOffsetX = contentOffsetX + dx;
+            contentOffsetY = contentOffsetY + dy;
+        end
     end
 
     ---
@@ -105,6 +119,28 @@ function Panel.new(x, y, w, h)
         contentOffsetX, contentOffsetY = 0, 0;
         w = math.max(MIN_WIDTH, math.min(love.graphics.getWidth() - x, mx - x + BORDER_SIZE));
         h = math.max(MIN_HEIGHT, math.min(love.graphics.getHeight() - y, my - y + BORDER_SIZE));
+    end
+
+    function self:mousepressed(x, y, b)
+        if b == 'l' then
+            if contentFocus then
+                scroll = true;
+            elseif cornerFocus then
+                resize = true;
+            elseif headerFocus then
+                drag = true;
+            end
+        end
+    end
+
+    function self:mousereleased(x, y, b)
+        resize = false;
+        drag = false;
+        scroll = false;
+    end
+
+    function self:doubleclick()
+        self:setContentPosition(0, 0);
     end
 
     -- ------------------------------------------------
