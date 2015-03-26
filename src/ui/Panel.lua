@@ -42,6 +42,9 @@ function Panel.new(x, y, w, h)
     local x = math.min(love.graphics.getWidth() - w, x);
     local y = math.min(love.graphics.getHeight() - h, y);
 
+    local mx, my; -- The current mouse position.
+    local ox, oy; -- The position relative to the panel's coordinates.
+
     local content;
     local contentOffsetX, contentOffsetY = 0, 0;
 
@@ -85,16 +88,17 @@ function Panel.new(x, y, w, h)
     -- @param dt
     --
     function self:update(dt)
-        local mx, my = love.mouse.getPosition();
+        mx, my = love.mouse.getPosition();
+
         contentFocus = x + BORDER_SIZE < mx and x + w - BORDER_SIZE > mx and y + BORDER_SIZE < my and y + h - BORDER_SIZE > my;
         cornerFocus = x + w - BORDER_SIZE < mx and x + w > mx and y + h - BORDER_SIZE < my and y + h > my;
         headerFocus = x < mx and x + w > mx and y < my and y + BORDER_SIZE > my;
 
         if resize then
-            self:resize(love.mouse.getX(), love.mouse.getY());
+            self:resize(mx, my);
         end
         if drag then
-            self:setPosition(love.mouse.getX(), love.mouse.getY());
+            self:setPosition(mx - ox, my - oy);
         end
     end
 
@@ -121,7 +125,7 @@ function Panel.new(x, y, w, h)
         h = math.max(MIN_HEIGHT, math.min(love.graphics.getHeight() - y, my - y + BORDER_SIZE));
     end
 
-    function self:mousepressed(x, y, b)
+    function self:mousepressed(mx, my, b)
         if b == 'l' then
             if contentFocus then
                 scroll = true;
@@ -130,6 +134,9 @@ function Panel.new(x, y, w, h)
             elseif headerFocus then
                 drag = true;
             end
+
+            -- Calculate the mouse offset on the panel.
+            ox, oy = mx - x, my - y;
         end
     end
 
@@ -137,6 +144,7 @@ function Panel.new(x, y, w, h)
         resize = false;
         drag = false;
         scroll = false;
+        ox, oy = 0, 0;
     end
 
     function self:doubleclick()
