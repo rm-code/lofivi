@@ -90,9 +90,11 @@ function Panel.new(x, y, w, h)
     function self:update(dt)
         mx, my = love.mouse.getPosition();
 
-        contentFocus = x + BORDER_SIZE < mx and x + w - BORDER_SIZE > mx and y + BORDER_SIZE < my and y + h - BORDER_SIZE > my;
-        cornerFocus = x + w - BORDER_SIZE < mx and x + w > mx and y + h - BORDER_SIZE < my and y + h > my;
-        headerFocus = x < mx and x + w > mx and y < my and y + BORDER_SIZE > my;
+        if not resize and not drag and not scroll then
+            contentFocus = x + BORDER_SIZE < mx and x + w - BORDER_SIZE > mx and y + BORDER_SIZE < my and y + h - BORDER_SIZE > my;
+            cornerFocus = x + w - BORDER_SIZE < mx and x + w > mx and y + h - BORDER_SIZE < my and y + h > my;
+            headerFocus = x < mx and x + w > mx and y < my and y + BORDER_SIZE > my;
+        end
 
         if resize then
             self:resize(mx, my);
