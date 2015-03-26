@@ -43,7 +43,6 @@ function Panel.new(x, y, w, h)
     local y = math.min(love.graphics.getHeight() - h, y);
 
     local mx, my; -- The current mouse position.
-    local ox, oy; -- The position relative to the panel's coordinates.
 
     local content;
     local contentOffsetX, contentOffsetY = 0, 0;
@@ -103,10 +102,8 @@ function Panel.new(x, y, w, h)
     -- @param dy
     --
     function self:scroll(dx, dy)
-        if scroll then
-            contentOffsetX = contentOffsetX + dx;
-            contentOffsetY = contentOffsetY + dy;
-        end
+        contentOffsetX = contentOffsetX + dx;
+        contentOffsetY = contentOffsetY + dy;
     end
 
     ---
@@ -129,17 +126,11 @@ function Panel.new(x, y, w, h)
             elseif headerFocus then
                 drag = true;
             end
-
-            -- Calculate the mouse offset on the panel.
-            ox, oy = mx - x, my - y;
         end
     end
 
     function self:mousereleased(x, y, b)
-        resize = false;
-        drag = false;
-        scroll = false;
-        ox, oy = 0, 0;
+        resize, drag, scroll = false, false, false;
     end
 
     function self:mousemoved(mx, my, dx, dy)
@@ -148,8 +139,7 @@ function Panel.new(x, y, w, h)
         elseif resize then
             self:resize(mx, my);
         elseif scroll then
-            contentOffsetX = contentOffsetX;
-            contentOffsetY = contentOffsetY + dy;
+            self:scroll(0, dy);
         end
     end
 
