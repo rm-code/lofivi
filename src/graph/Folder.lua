@@ -35,6 +35,12 @@ local SPRITE_SIZE = 0.45;
 local SPRITE_OFFSET = 15;
 
 -- ------------------------------------------------
+-- Local Variables
+-- ------------------------------------------------
+
+local speed;
+
+-- ------------------------------------------------
 -- Constructor
 -- ------------------------------------------------
 
@@ -46,7 +52,6 @@ function Folder.new(spriteBatch, parent, name, x, y)
     local children = {};
     local childCount = 0;
 
-    local speed = 64;
     local px, py = x, y; -- Position.
     local vx, vy = 0, 0; -- Velocity.
     local ax, ay = 0, 0; -- Acceleration.
@@ -306,6 +311,10 @@ function Folder.new(spriteBatch, parent, name, x, y)
     end
 
     return self;
+end
+
+function Folder.setSpeed(nspeed)
+    speed = nspeed;
 end
 
 return Folder;

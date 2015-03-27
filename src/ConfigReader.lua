@@ -49,6 +49,8 @@ return {
         logoPosY = 10,
         logoScaleX = 1,         -- The logo's scale.
         logoScaleY = 1,
+
+        nodeSpeed = 128,        -- Defines the speed for moving nodes around
     },
 
     -- See https://love2d.org/wiki/KeyConstant for a list of possible keycodes.

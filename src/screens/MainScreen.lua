@@ -23,6 +23,7 @@
 local Screen = require('lib/screenmanager/Screen');
 local ExtensionHandler = require('src/ExtensionHandler');
 local Graph = require('src/graph/Graph');
+local Folder = require('src/graph/Folder');
 local Camera = require('lib/camera/Camera');
 local ConfigReader = require('src/ConfigReader');
 local Panel = require('src/ui/Panel');
@@ -307,6 +308,9 @@ function MainScreen.new()
             config.options.logoScaleX,
             config.options.logoScaleY);
         logo:setVisible(config.options.showLogo);
+
+        -- Define the node's speed.
+        Folder.setSpeed(config.options.nodeSpeed);
     end
 
     function self:draw()
