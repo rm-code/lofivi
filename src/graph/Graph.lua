@@ -51,17 +51,7 @@ function Graph.new(showLabels)
     -- ------------------------------------------------
 
     local function updateBoundaries(minX, maxX, minY, maxY, nx, ny)
-        if nx < minX then
-            minX = nx;
-        elseif nx > maxX then
-            maxX = nx;
-        end
-        if ny < minY then
-            minY = ny;
-        elseif ny > maxY then
-            maxY = ny;
-        end
-        return minX, maxX, minY, maxY;
+        return math.min(nx, minX), math.max(nx, maxX), math.min(ny, minY), math.max(ny, maxY);
     end
 
     ---
