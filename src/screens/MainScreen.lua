@@ -173,10 +173,9 @@ function MainScreen.new()
     -- in LoFiVi's save directory if it doesn't exist yet.
     --
     local function createScreenshot()
-        local screenshot = love.graphics.newScreenshot();
-        love.filesystem.createDirectory('screenshots');
         local filename = os.time() .. '.png';
-        screenshot:encode('screenshots/' .. filename);
+        love.filesystem.createDirectory('screenshots');
+        love.graphics.newScreenshot():encode('screenshots/' .. filename);
         print('Created screenshot: ' .. filename);
     end
 
