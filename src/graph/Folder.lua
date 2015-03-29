@@ -31,6 +31,15 @@ local FORCE_MAX = 4;
 local LABEL_FONT = love.graphics.newFont(25);
 local DEFAULT_FONT = love.graphics.newFont(12);
 
+local SPRITE_SIZE = 0.45;
+local SPRITE_OFFSET = 15;
+
+-- ------------------------------------------------
+-- Local Variables
+-- ------------------------------------------------
+
+local speed;
+
 -- ------------------------------------------------
 -- Constructor
 -- ------------------------------------------------
@@ -43,7 +52,6 @@ function Folder.new(spriteBatch, parent, name, x, y)
     local children = {};
     local childCount = 0;
 
-    local speed = 64;
     local px, py = x, y; -- Position.
     local vx, vy = 0, 0; -- Velocity.
     local ax, ay = 0, 0; -- Acceleration.
@@ -119,10 +127,20 @@ function Folder.new(spriteBatch, parent, name, x, y)
         -- Get a blueprint of how the file nodes need to be distributed amongst different layers.
         local layers = createOnionLayers(count);
 
+        -- Sort files based on their extension before placing them.
+        local toSort = {};
+        for _, file in pairs(files) do
+            toSort[#toSort + 1] = { extension = file:getExtension(), file = file };
+        end
+        table.sort(toSort, function(a, b)
+            return a.extension > b.extension;
+        end)
+
         -- Update the position of the file nodes based on the previously calculated onion-layers.
         local fileCounter = 0;
         local layer = 1;
-        for _, file in pairs(files) do
+        for i = 1, #toSort do
+            local file = toSort[i].file;
             fileCounter = fileCounter + 1;
 
             -- If we have more files on the current layer than allowed, we "move"
@@ -168,7 +186,7 @@ function Folder.new(spriteBatch, parent, name, x, y)
     function self:update(dt)
         for _, file in pairs(files) do
             spriteBatch:setColor(file:getColor());
-            spriteBatch:add(px + file:getOffsetX(), py + file:getOffsetY(), 0, 1, 1, 10,10);
+            spriteBatch:add(px + file:getOffsetX(), py + file:getOffsetY(), 0, SPRITE_SIZE, SPRITE_SIZE, SPRITE_OFFSET, SPRITE_OFFSET);
         end
     end
 
@@ -198,7 +216,7 @@ function Folder.new(spriteBatch, parent, name, x, y)
     -- @param spring
     --
     function self:attract(nodeB, spring)
-        local dx, dy = self:getX() - nodeB:getX(), self:getY() - nodeB:getY();
+        local dx, dy = px - nodeB:getX(), py - nodeB:getY();
         local distance = math.sqrt(dx * dx + dy * dy);
 
         -- Normalise vector.
@@ -212,12 +230,12 @@ function Folder.new(spriteBatch, parent, name, x, y)
 
     ---
     -- Repels the node from nodeB.
-    -- @param fileB
+    -- @param nodeB
     -- @param charge
     --
-    function self:repel(fileB, charge)
+    function self:repel(nodeB, charge)
         -- Calculate distance vector.
-        local dx, dy = self:getX() - fileB:getX(), self:getY() - fileB:getY();
+        local dx, dy = px - nodeB:getX(), py - nodeB:getY();
         local distance = math.sqrt(dx * dx + dy * dy);
 
         -- Normalise vector.
@@ -225,7 +243,7 @@ function Folder.new(spriteBatch, parent, name, x, y)
         dy = dy / distance;
 
         -- Calculate force's strength and apply it to the vector.
-        local strength = charge * ((self:getMass() * fileB:getMass()) / (distance * distance));
+        local strength = charge * ((self:getMass() * nodeB:getMass()) / (distance * distance));
         dx = dx * strength;
         dy = dy * strength;
 
@@ -251,6 +269,14 @@ function Folder.new(spriteBatch, parent, name, x, y)
         py = py + vy;
         ax, ay = 0, 0; -- Reset acceleration for the next update cycle.
         return px, py;
+    end
+
+    -- ------------------------------------------------
+    -- Setters
+    -- ------------------------------------------------
+
+    function self:setPosition(nx, ny)
+        px, py = nx, ny;
     end
 
     -- ------------------------------------------------
@@ -285,6 +311,10 @@ function Folder.new(spriteBatch, parent, name, x, y)
     end
 
     return self;
+end
+
+function Folder.setSpeed(nspeed)
+    speed = nspeed;
 end
 
 return Folder;

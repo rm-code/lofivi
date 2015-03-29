@@ -38,21 +38,37 @@ return {
         showLabels = false,
         showFileList = true,
 
-        -- See https://love2d.org/wiki/KeyConstant for a list of possible keycodes.
-        keyBindings = {
-            camera_n =        'w', -- Move camera up
-            camera_w =        'a', -- Move camera left
-            camera_s =        's', -- Move camera down
-            camera_e =        'd', -- Move camera right
-            camera_rotateL =  'q', -- Rotate camera left
-            camera_rotateR =  'e', -- Rotate camera right
-            camera_zoomIn =   '+', -- Zoom in
-            camera_zoomOut =  '-', -- Zoom out
-            graph_reset =     'r', -- Reloads the whole graph
-            take_screenshot = ' ', -- Take a screenshot
-            toggleLabels =    '1', -- Hide / Show labels
-            toggleFileList =  '2', -- Hide / Show file list
-        },
+        fullscreen = true,      -- Toggle fullscreen
+        fsType = 'desktop',     -- FullscreenMode ('normal' or 'desktop')
+        screenW = 0,
+        screenH = 0,
+
+        showLogo = true,
+        logo = 'logo.png',      -- A custom logo to load.
+        logoPosX = 10,          -- The logo's screen-position.
+        logoPosY = 10,
+        logoScaleX = 1,         -- The logo's scale.
+        logoScaleY = 1,
+
+        nodeSpeed = 128,        -- Defines the speed for moving nodes around
+    },
+
+    -- See https://love2d.org/wiki/KeyConstant for a list of possible keycodes.
+    keyBindings = {
+        camera_n =         'w', -- Move camera up
+        camera_w =         'a', -- Move camera left
+        camera_s =         's', -- Move camera down
+        camera_e =         'd', -- Move camera right
+        camera_rotateL =   'q', -- Rotate camera left
+        camera_rotateR =   'e', -- Rotate camera right
+        camera_zoomIn =    '+', -- Zoom in
+        camera_zoomOut =   '-', -- Zoom out
+        graph_reset =      'r', -- Reloads the whole graph
+        take_screenshot =  ' ', -- Take a screenshot
+        toggleLabels =     '1', -- Hide / Show labels
+        toggleFileList =   '2', -- Hide / Show file list
+        toggleLogo =       '3', -- Hide / Show logo
+        toggleFullscreen = 'f', -- Toggle fullscreen
     },
 
     -- Can be used to assign a specific color to a file extension (RGB or RGBA).

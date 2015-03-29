@@ -20,47 +20,34 @@
 -- THE SOFTWARE.                                                                                   =
 --==================================================================================================
 
-local Camera = {};
+local Logo = {};
 
-function Camera.new()
+function Logo.new(path, x, y, sx, sy)
     local self = {};
 
-    local px, py = 0, 0;
-    local scale = 1;
-    local angle = 0;
+    local visible;
 
-    function self:set()
-        love.graphics.push();
-        local width = love.graphics.getWidth();
-        local height = love.graphics.getHeight();
-
-        love.graphics.scale(scale, scale);
-        love.graphics.translate(-px, -py);
-        love.graphics.translate(width / (2 * scale), height / (2 * scale));
-
-        love.graphics.translate(width / 2, height / 2);
-        love.graphics.rotate(angle);
-        love.graphics.translate(-width / 2, -height / 2);
+    local ok, image = pcall(love.graphics.newImage, path);
+    if not ok then
+        print("Couldn't load logo from: " .. path);
+        image = nil;
     end
 
-    function self:unset()
-        love.graphics.pop();
+    function self:draw()
+        if image and visible then
+            love.graphics.draw(image, x, y, 0, sx, sy);
+        end
     end
 
-    function self:track(tarX, tarY, speed, dt)
-        px = px - (px - math.floor(tarX)) * dt * speed;
-        py = py - (py - math.floor(tarY)) * dt * speed;
+    function self:setVisible(nvisible)
+        visible = nvisible;
     end
 
-    function self:zoom(factor, dt)
-        scale = scale + factor * dt;
-    end
-
-    function self:rotate(da, dt)
-        angle = angle + da * dt;
+    function self:isVisible()
+        return visible;
     end
 
     return self;
 end
 
-return Camera;
+return Logo;

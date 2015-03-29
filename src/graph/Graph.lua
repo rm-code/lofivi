@@ -43,10 +43,7 @@ function Graph.new(showLabels)
 
     local showLabels = showLabels;
 
-    local sprite = love.graphics.newCanvas(20, 20, 'normal', 16);
-    sprite:renderTo(function()
-        love.graphics.circle('fill', 10, 10, 7, 30);
-    end);
+    local sprite = love.graphics.newImage('res/img/node.png');
     local spritebatch = love.graphics.newSpriteBatch(sprite, 10000, 'stream');
 
     -- ------------------------------------------------
@@ -54,17 +51,7 @@ function Graph.new(showLabels)
     -- ------------------------------------------------
 
     local function updateBoundaries(minX, maxX, minY, maxY, nx, ny)
-        if nx < minX then
-            minX = nx;
-        elseif nx > maxX then
-            maxX = nx;
-        end
-        if ny < minY then
-            minY = ny;
-        elseif ny > maxY then
-            maxY = ny;
-        end
-        return minX, maxX, minY, maxY;
+        return math.min(nx, minX), math.max(nx, maxX), math.min(ny, minY), math.max(ny, maxY);
     end
 
     ---
@@ -76,6 +63,7 @@ function Graph.new(showLabels)
     local function createGraph(paths)
         local nodes = { Folder.new(spritebatch, nil, 'root', love.graphics.getWidth() * 0.5, love.graphics.getHeight() * 0.5) };
         local tree = nodes[#nodes];
+        local fileCounter = 0;
 
         for i = 1, #paths do
             local target;
@@ -92,8 +80,9 @@ function Graph.new(showLabels)
                 if name == 'root' then
                     target = nodes[1];
                 elseif i == #splitPath then
-                    local col = ExtensionHandler.add(name); -- Get a colour for this file.
-                    target:addFile(name, File.new(name, col));
+                    local col, ext = ExtensionHandler.add(name); -- Get a colour for this file.
+                    target:addFile(name, File.new(ext, col));
+                    fileCounter = fileCounter + 1;
                 else
                     -- Get the next folder as a target. If that folder doesn't exist in our graph yet, create it first.
                     local nt = target:getChild(name);
@@ -110,6 +99,8 @@ function Graph.new(showLabels)
                 end
             end
         end
+
+        print('Created ' .. #nodes .. ' folders and ' .. fileCounter .. ' files.');
 
         return tree, nodes;
     end
@@ -153,6 +144,23 @@ function Graph.new(showLabels)
     function self:toggleLabels()
         showLabels = not showLabels;
     end
+
+    function self:grab(x, y)
+        for i = 1, #nodes do
+            local node = nodes[i];
+            local margin = 15;
+            if x < node:getX() + margin
+                    and x > node:getX() - margin
+                    and y < node:getY() + margin
+                    and y > node:getY() - margin then
+                return node;
+            end
+        end
+    end
+
+    -- ------------------------------------------------
+    -- Getters
+    -- ------------------------------------------------
 
     function self:getCenter()
         return minX + (maxX - minX) * 0.5, minY + (maxY - minY) * 0.5;

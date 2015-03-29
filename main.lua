@@ -124,3 +124,7 @@ end
 function love.mousereleased(x, y, b)
     ScreenManager.mousereleased(x, y, b);
 end
+
+function love.mousemoved(x, y, dx, dy)
+    ScreenManager.mousemoved(x, y, dx, dy);
+end

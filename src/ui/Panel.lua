@@ -42,17 +42,30 @@ function Panel.new(x, y, w, h)
     local x = math.min(love.graphics.getWidth() - w, x);
     local y = math.min(love.graphics.getHeight() - h, y);
 
+    local mx, my; -- The current mouse position.
+
     local content;
     local contentOffsetX, contentOffsetY = 0, 0;
+
     local contentFocus = false;
     local headerFocus = false;
     local cornerFocus = false;
+
+    local resize = false;
+    local scroll = false;
+    local drag = false;
+
+    local visible;
 
     -- ------------------------------------------------
     -- Public Functions
     -- ------------------------------------------------
 
     function self:draw()
+        if not visible then
+            return;
+        end
+
         love.graphics.setColor(255, 255, 255, contentFocus and 40 or 20);
         love.graphics.rectangle('fill', x + BORDER_SIZE, y + BORDER_SIZE, w - 2 * BORDER_SIZE, h - 2 * BORDER_SIZE);
 
@@ -74,10 +87,13 @@ function Panel.new(x, y, w, h)
     -- @param dt
     --
     function self:update(dt)
-        local mx, my = love.mouse.getPosition();
-        contentFocus = x + BORDER_SIZE < mx and x + w - BORDER_SIZE > mx and y + BORDER_SIZE < my and y + h - BORDER_SIZE > my;
-        cornerFocus = x + w - BORDER_SIZE < mx and x + w > mx and y + h - BORDER_SIZE < my and y + h > my;
-        headerFocus = x < mx and x + w > mx and y < my and y + BORDER_SIZE > my;
+        mx, my = love.mouse.getPosition();
+
+        if not resize and not drag and not scroll then
+            contentFocus = x + BORDER_SIZE < mx and x + w - BORDER_SIZE > mx and y + BORDER_SIZE < my and y + h - BORDER_SIZE > my;
+            cornerFocus = x + w - BORDER_SIZE < mx and x + w > mx and y + h - BORDER_SIZE < my and y + h > my;
+            headerFocus = x < mx and x + w > mx and y < my and y + BORDER_SIZE > my;
+        end
     end
 
     ---
@@ -99,6 +115,36 @@ function Panel.new(x, y, w, h)
         contentOffsetX, contentOffsetY = 0, 0;
         w = math.max(MIN_WIDTH, math.min(love.graphics.getWidth() - x, mx - x + BORDER_SIZE));
         h = math.max(MIN_HEIGHT, math.min(love.graphics.getHeight() - y, my - y + BORDER_SIZE));
+    end
+
+    function self:mousepressed(mx, my, b)
+        if b == 'l' then
+            if contentFocus then
+                scroll = true;
+            elseif cornerFocus then
+                resize = true;
+            elseif headerFocus then
+                drag = true;
+            end
+        end
+    end
+
+    function self:mousereleased(x, y, b)
+        resize, drag, scroll = false, false, false;
+    end
+
+    function self:mousemoved(mx, my, dx, dy)
+        if drag then
+            self:setPosition(x + dx, y + dy);
+        elseif resize then
+            self:resize(mx, my);
+        elseif scroll then
+            self:scroll(0, dy);
+        end
+    end
+
+    function self:doubleclick()
+        self:setContentPosition(0, 0);
     end
 
     -- ------------------------------------------------
@@ -129,6 +175,10 @@ function Panel.new(x, y, w, h)
         y = math.min(love.graphics.getHeight() - h, ny);
     end
 
+    function self:setVisible(nvisible)
+        visible = nvisible;
+    end
+
     -- ------------------------------------------------
     -- Getters
     -- ------------------------------------------------
@@ -143,6 +193,10 @@ function Panel.new(x, y, w, h)
 
     function self:hasHeaderFocus()
         return headerFocus;
+    end
+
+    function self:isVisible()
+        return visible;
     end
 
     return self;
