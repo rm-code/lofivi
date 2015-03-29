@@ -304,8 +304,7 @@ function MainScreen.new()
         ox, oy = 0, 0; -- Camera offset.
 
         graph = createGraph('root', config);
-        panel = createPanel();
-        panel:setVisible(config.options.showFileList);
+        panel = createPanel(config.options.showFileList);
 
         -- Load a logo according to the config file.
         logo = Logo.new(config.options.logo,
