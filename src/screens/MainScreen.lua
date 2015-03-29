@@ -182,10 +182,11 @@ function MainScreen.new()
     ---
     -- Creates the panel containing the sorted list of file extensions.
     --
-    local function createPanel()
+    local function createPanel(pvisible)
         local canvas = ExtensionHandler.createCanvas();
         local panel = Panel.new(love.graphics.getWidth() - canvas:getWidth(), 0, canvas:getWidth(), canvas:getHeight() + 20);
         panel:setContent(canvas);
+        panel:setVisible(pvisible);
         return panel;
     end
 
@@ -256,6 +257,12 @@ function MainScreen.new()
         camera:lookAt(camX, camY);
 
         return ox, oy;
+    end
+
+    local function resetGraph()
+        ExtensionHandler.reset();
+        graph = createGraph('root', config);
+        panel = createPanel(panel:isVisible());
     end
 
     -- ------------------------------------------------
@@ -338,9 +345,7 @@ function MainScreen.new()
 
     function self:keypressed(key)
         if key == graph_reset then
-            ExtensionHandler.reset();
-            graph = createGraph('root', config);
-            panel = createPanel();
+            resetGraph(panel:isVisible());
         elseif key == take_screenshot then
             createScreenshot();
         elseif key == toggleLabels then
