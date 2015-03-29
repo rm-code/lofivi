@@ -24,7 +24,7 @@ local GAME_TITLE = "LoFiVi";
 
 local GAME_IDENTITY = "rmcode_LoFiVi";
 
-local GAME_VERSION = "0085";
+local GAME_VERSION = "0121";
 
 local LOVE_VERSION = "0.9.2";
 
