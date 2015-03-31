@@ -114,8 +114,8 @@ function Graph.new(showLabels)
         minX, minY, maxX, maxY = tree:getX(), tree:getX(), tree:getY(), tree:getY();
     end
 
-    function self:draw()
-        tree:draw(showLabels);
+    function self:draw(rotation)
+        tree:draw(rotation, showLabels);
         love.graphics.draw(spritebatch);
     end
 

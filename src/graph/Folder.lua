@@ -164,13 +164,13 @@ function Folder.new(spriteBatch, parent, name, x, y)
     -- Public Functions
     -- ------------------------------------------------
 
-    function self:draw(showLabels)
+    function self:draw(rotation, showLabels)
         love.graphics.circle('fill', px, py, 2, 10);
 
         if showLabels then
             love.graphics.setFont(LABEL_FONT);
             love.graphics.setColor(255, 255, 255, 105);
-            love.graphics.print(name, px + 10 + radius, py + 10);
+            love.graphics.print(name, px, py, -rotation, 1, 1, -radius, -radius);
             love.graphics.setColor(255, 255, 255, 255);
             love.graphics.setFont(DEFAULT_FONT);
         end
@@ -179,7 +179,7 @@ function Folder.new(spriteBatch, parent, name, x, y)
             love.graphics.setColor(255, 255, 255, 55);
             love.graphics.line(px, py, node:getX(), node:getY());
             love.graphics.setColor(255, 255, 255, 255);
-            node:draw(showLabels);
+            node:draw(rotation, showLabels);
         end
     end
 
