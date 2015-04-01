@@ -307,7 +307,7 @@ function Folder.new(spriteBatch, parent, name, x, y)
     end
 
     function self:getMass()
-        return 0.01 * childCount + 0.001 * math.max(1, fileCount);
+        return 0.01 * (childCount + math.log(math.max(15, radius)));
     end
 
     return self;
