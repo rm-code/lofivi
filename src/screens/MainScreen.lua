@@ -297,6 +297,7 @@ function MainScreen.new()
         toggleFileList = config.keyBindings.toggleFileList;
         toggleLogo = config.keyBindings.toggleLogo;
         toggleFullscreen = config.keyBindings.toggleFullscreen;
+        exit = config.keyBindings.exit;
 
         -- Create the camera.
         camera = Camera.new();
@@ -355,6 +356,8 @@ function MainScreen.new()
             logo:setVisible(not logo:isVisible());
         elseif key == toggleFullscreen then
             love.window.setFullscreen(not love.window.getFullscreen());
+        elseif key == exit then
+            love.event.quit();
         end
     end
 

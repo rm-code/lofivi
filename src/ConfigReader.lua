@@ -69,6 +69,7 @@ return {
         toggleFileList =   '2', -- Hide / Show file list
         toggleLogo =       '3', -- Hide / Show logo
         toggleFullscreen = 'f', -- Toggle fullscreen
+        exit =             'escape', -- Exit
     },
 
     -- Can be used to assign a specific color to a file extension (RGB or RGBA).
