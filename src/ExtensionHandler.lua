@@ -96,7 +96,7 @@ function ExtensionHandler.createCanvas()
 
     local canvas = love.graphics.newCanvas(width, height);
     canvas:renderTo(function()
-        love.graphics.setBlendMode('premultiplied');
+        love.graphics.setBlendMode('alpha', false);
         love.graphics.setFont(LIST_FONT);
         love.graphics.print(string.format('%5.d %s', totalFiles, 'Files', 0, 20));
         for i = 1, #toSort do
