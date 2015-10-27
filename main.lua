@@ -116,3 +116,7 @@ end
 function love.mousemoved(x, y, dx, dy)
     ScreenManager.mousemoved(x, y, dx, dy);
 end
+
+function love.directorydropped(path)
+    ScreenManager.directorydropped(path);
+end

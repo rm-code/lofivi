@@ -386,6 +386,11 @@ function MainScreen.new()
         panel:mousemoved(x, y, dx, dy);
     end
 
+    function self:directorydropped(path)
+        love.filesystem.mount(path, 'root');
+        resetGraph();
+    end
+
     return self;
 end
 
