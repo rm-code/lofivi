@@ -52,7 +52,6 @@ function Panel.new(x, y, w, h)
     local cornerFocus = false;
 
     local resize = false;
-    local scroll = false;
     local drag = false;
 
     local visible;
@@ -89,7 +88,7 @@ function Panel.new(x, y, w, h)
     function self:update(dt)
         mx, my = love.mouse.getPosition();
 
-        if not resize and not drag and not scroll then
+        if not resize and not drag then
             contentFocus = x + BORDER_SIZE < mx and x + w - BORDER_SIZE > mx and y + BORDER_SIZE < my and y + h - BORDER_SIZE > my;
             cornerFocus = x + w - BORDER_SIZE < mx and x + w > mx and y + h - BORDER_SIZE < my and y + h > my;
             headerFocus = x < mx and x + w > mx and y < my and y + BORDER_SIZE > my;
@@ -119,9 +118,7 @@ function Panel.new(x, y, w, h)
 
     function self:mousepressed(mx, my, b)
         if b == 1 then
-            if contentFocus then
-                scroll = true;
-            elseif cornerFocus then
+            if cornerFocus then
                 resize = true;
             elseif headerFocus then
                 drag = true;
@@ -130,7 +127,7 @@ function Panel.new(x, y, w, h)
     end
 
     function self:mousereleased(x, y, b)
-        resize, drag, scroll = false, false, false;
+        resize, drag = false, false;
     end
 
     function self:mousemoved(mx, my, dx, dy)
@@ -138,9 +135,11 @@ function Panel.new(x, y, w, h)
             self:setPosition(x + dx, y + dy);
         elseif resize then
             self:resize(mx, my);
-        elseif scroll then
-            self:scroll(0, dy);
         end
+    end
+
+    function self:wheelmoved(x, y)
+        self:scroll(0, y);
     end
 
     function self:doubleclick()
