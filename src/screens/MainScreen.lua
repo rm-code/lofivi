@@ -317,6 +317,8 @@ function MainScreen.new()
 
         -- Define the node's speed.
         Folder.setSpeed(config.options.nodeSpeed);
+
+        love.graphics.setLineWidth(5);
     end
 
     function self:draw()
