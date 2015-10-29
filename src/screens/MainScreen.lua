@@ -364,16 +364,16 @@ function MainScreen.new()
     function self:mousepressed(x, y, b)
         panel:mousepressed(x, y, b);
 
-        if b == 'l' and clickTime < 0.5 then
+        if b == 1 and clickTime < 0.5 then
             panel:doubleclick();
             clickTime = 0;
         else
             clickTime = 0;
         end
 
-        if b == 'l' then
+        if b == 1 then
             grabbedNode = graph:grab(camera:worldCoords(x, y));
-        elseif b == 'r' then
+        elseif b == 2 then
             grabbedNode = nil;
         end
     end
