@@ -20,14 +20,14 @@
 -- THE SOFTWARE.                                                                                   =
 --==================================================================================================
 
-local Screen = require('lib/screenmanager/Screen');
-local ExtensionHandler = require('src/ExtensionHandler');
-local Graph = require('src/graph/Graph');
-local Folder = require('src/graph/Folder');
-local Camera = require('lib/camera/Camera');
-local ConfigReader = require('src/ConfigReader');
-local Panel = require('src/ui/Panel');
-local Logo = require('src/ui/Logo');
+local Screen = require('lib.screenmanager.Screen');
+local ExtensionHandler = require('src.ExtensionHandler');
+local Graph = require('src.graph.Graph');
+local Folder = require('src.graph.Folder');
+local Camera = require('lib.camera.Camera');
+local ConfigReader = require('src.ConfigReader');
+local Panel = require('src.ui.Panel');
+local Logo = require('src.ui.Logo');
 
 -- ------------------------------------------------
 -- Module

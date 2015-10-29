@@ -20,9 +20,9 @@
 -- THE SOFTWARE.                                                                                   =
 --==================================================================================================
 
-local Folder = require('src/graph/Folder');
-local File = require('src/graph/File');
-local ExtensionHandler = require('src/ExtensionHandler');
+local Folder = require('src.graph.Folder');
+local File = require('src.graph.File');
+local ExtensionHandler = require('src.ExtensionHandler');
 
 -- ------------------------------------------------
 -- Module
