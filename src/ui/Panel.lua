@@ -118,7 +118,7 @@ function Panel.new(x, y, w, h)
     end
 
     function self:mousepressed(mx, my, b)
-        if b == 'l' then
+        if b == 1 then
             if contentFocus then
                 scroll = true;
             elseif cornerFocus then
