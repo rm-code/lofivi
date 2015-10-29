@@ -5,6 +5,7 @@ local Folder = require('src.graph.Folder');
 local Camera = require('lib.camera.Camera');
 local ConfigReader = require('src.ConfigReader');
 local Panel = require('src.ui.Panel');
+local InfoPanel = require('src.ui.InfoPanel');
 local Logo = require('src.ui.Logo');
 
 -- ------------------------------------------------
@@ -16,14 +17,6 @@ local MainScreen = {};
 -- ------------------------------------------------
 -- Constants
 -- ------------------------------------------------
-
-local WARNING_MESSAGE = [[
-To use LoFiVi you will have to place the folder structure you want to be visualised in the root folder of LoFiVi's save folder.
-
-After you have placed it there you can use the R-Key to regenerate the graph.
-
-LoFiVi will now open the file directory in which to place the folder.
-]];
 
 local CAMERA_ROTATION_SPEED = 0.6;
 local CAMERA_TRANSLATION_SPEED = 400;
@@ -69,6 +62,7 @@ function MainScreen.new()
     local clickTime = 0;
 
     local panel;
+    local infoPanel;
     local logo;
 
     local grabbedNode;
@@ -105,15 +99,11 @@ function MainScreen.new()
     end
 
     ---
-    -- Creates the necessary folders if they don't exist yet, shows a
-    -- message box to the user and opens the root folder in a
-    -- finder / explorer window.
+    -- Creates the root folder we'll mount our directories to later on.
     --
     local function setUpFolders()
-        if not love.filesystem.isDirectory('root') or #love.filesystem.getDirectoryItems('root') == 0 then
+        if not love.filesystem.isDirectory('root') then
             love.filesystem.createDirectory('root');
-            love.window.showMessageBox('No content found.', WARNING_MESSAGE, 'warning', false);
-            love.system.openURL('file://' .. love.filesystem.getSaveDirectory() .. '/root');
         end
     end
 
@@ -241,6 +231,7 @@ function MainScreen.new()
         ExtensionHandler.reset();
         graph = createGraph('root', config);
         panel = createPanel(panel:isVisible());
+        infoPanel = nil;
     end
 
     -- ------------------------------------------------
@@ -282,8 +273,8 @@ function MainScreen.new()
         camX, camY = 0, 0;
         ox, oy = 0, 0; -- Camera offset.
 
-        graph = createGraph('root', config);
         panel = createPanel(config.options.showFileList);
+        infoPanel = InfoPanel.new(love.graphics.getWidth() * 0.5, love.graphics.getHeight() * 0.5);
 
         -- Load a logo according to the config file.
         logo = Logo.new(config.options.logo,
@@ -300,15 +291,26 @@ function MainScreen.new()
     end
 
     function self:draw()
+        if infoPanel then
+            infoPanel:draw();
+            return;
+        end
+
         camera:draw(function()
             graph:draw(camera.rot);
         end);
 
         panel:draw();
+
         logo:draw();
     end
 
     function self:update(dt)
+        if infoPanel then
+            infoPanel:update(dt);
+            return;
+        end
+
         graph:update(dt);
         panel:update(dt);
 
