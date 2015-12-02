@@ -296,14 +296,12 @@ function Folder.new(spriteBatch, parent, name, x, y)
     end
 
     function self:isConnectedTo(node)
-        if parent == node then
-            return true;
-        end
         for _, v in pairs(children) do
             if node == v then
                 return true;
             end
         end
+        return parent == node;
     end
 
     function self:getMass()
