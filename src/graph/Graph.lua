@@ -98,25 +98,16 @@ function Graph.new(showLabels)
     end
 
     function self:update(dt)
-        minX, maxX, minY, maxY = tree:getX(), tree:getX(), tree:getY(), tree:getY();
         spritebatch:clear();
-        for i = 1, #nodes do
-            local nodeA = nodes[i];
-            for j = 1, #nodes do
-                local nodeB = nodes[j];
-                if nodeA ~= nodeB then
-                    if nodeA:isConnectedTo(nodeB) then
-                        nodeA:attract(nodeB, -0.001);
-                    end
-                    nodeA:repel(nodeB, 1000000);
-                end
-            end
 
-            nodeA:damp(0.95);
-            nodeA:update(dt);
-            local nx, ny = nodeA:move(dt);
-            minX, maxX, minY, maxY = updateBoundaries(minX, maxX, minY, maxY, nx, ny);
+        for i = 1, #nodes do
+            for j = 1, #nodes do
+                nodes[i]:calculateForces(nodes[j]);
+            end
+            nodes[i]:update(dt);
         end
+
+        minX, maxX, minY, maxY = tree:getX(), tree:getX(), tree:getY(), tree:getY();
     end
 
     function self:toggleLabels()

@@ -14,6 +14,11 @@ local SPRITE_SCALE_FACTOR = SPRITE_SIZE / 256;
 local SPRITE_OFFSET = 128;
 local MIN_ARC_SIZE = SPRITE_SIZE;
 
+local FORCE_SPRING = -0.001;
+local FORCE_CHARGE = 1000000;
+
+local DAMPING_FACTOR = 0.95;
+
 -- ------------------------------------------------
 -- Local Variables
 -- ------------------------------------------------
@@ -32,9 +37,9 @@ function Folder.new(spriteBatch, parent, name, x, y)
     local children = {};
     local childCount = 0;
 
-    local px, py = x, y; -- Position.
-    local vx, vy = 0, 0; -- Velocity.
-    local ax, ay = 0, 0; -- Acceleration.
+    local posX, posY = x, y;
+    local velX, velY = 0, 0;
+    local accX, accY = 0, 0;
 
     local radius = 0;
 
@@ -50,6 +55,17 @@ function Folder.new(spriteBatch, parent, name, x, y)
     --
     local function clamp(min, val, max)
         return math.max(min, math.min(val, max));
+    end
+
+    ---
+    -- Calculates the new xy-acceleration for this node.
+    -- The values are clamped to keep the graph from "exploding".
+    -- @param fx - The force to apply in x-direction.
+    -- @param fy - The force to apply in y-direction.
+    --
+    local function applyForce(fx, fy)
+        accX = clamp(-FORCE_MAX, accX + fx, FORCE_MAX);
+        accY = clamp(-FORCE_MAX, accY + fy, FORCE_MAX);
     end
 
     ---
@@ -98,6 +114,18 @@ function Folder.new(spriteBatch, parent, name, x, y)
     end
 
     ---
+    -- Update the node's position based on the calculated velocity and
+    -- acceleration.
+    --
+    local function move(dt)
+        velX = (velX + accX * dt * speed) * DAMPING_FACTOR;
+        velY = (velY + accY * dt * speed) * DAMPING_FACTOR;
+        posX = posX + velX;
+        posY = posY + velY;
+        accX, accY = 0, 0;
+    end
+
+    ---
     -- Distributes files nodes evenly on a circle around the parent node.
     -- @param files
     --
@@ -143,28 +171,29 @@ function Folder.new(spriteBatch, parent, name, x, y)
     -- ------------------------------------------------
 
     function self:draw(rotation, showLabels)
-        love.graphics.circle('fill', px, py, 2, 10);
+        love.graphics.circle('fill', posX, posY, 2, 10);
 
         if showLabels then
             love.graphics.setFont(LABEL_FONT);
             love.graphics.setColor(255, 255, 255, 105);
-            love.graphics.print(name, px, py, -rotation, 1, 1, -radius, -radius);
+            love.graphics.print(name, posX, posY, -rotation, 1, 1, -radius, -radius);
             love.graphics.setColor(255, 255, 255, 255);
             love.graphics.setFont(DEFAULT_FONT);
         end
 
         for _, node in pairs(children) do
             love.graphics.setColor(255, 255, 255, 55);
-            love.graphics.line(px, py, node:getX(), node:getY());
+            love.graphics.line(posX, posY, node:getX(), node:getY());
             love.graphics.setColor(255, 255, 255, 255);
             node:draw(rotation, showLabels);
         end
     end
 
     function self:update(dt)
-        for _, file in pairs(files) do
+        move(dt);
+        for name, file in pairs(files) do
             spriteBatch:setColor(file:getColor());
-            spriteBatch:add(px + file:getOffsetX(), py + file:getOffsetY(), 0, SPRITE_SCALE_FACTOR, SPRITE_SCALE_FACTOR, SPRITE_OFFSET, SPRITE_OFFSET);
+            spriteBatch:add(posX + file:getOffsetX(), posY + file:getOffsetY(), 0, SPRITE_SCALE_FACTOR, SPRITE_SCALE_FACTOR, SPRITE_OFFSET, SPRITE_OFFSET);
         end
     end
 
@@ -181,72 +210,28 @@ function Folder.new(spriteBatch, parent, name, x, y)
     end
 
     ---
-    -- Add a damping factor.
-    -- @param f
+    -- Calculate and apply attraction and repulsion forces.
+    -- @param node
     --
-    function self:damp(f)
-        vx, vy = vx * f, vy * f;
-    end
+    function self:calculateForces(node)
+        if self == node then return end
 
-    ---
-    -- Attracts the node towards nodeB based on a spring force.
-    -- @param nodeB
-    -- @param spring
-    --
-    function self:attract(nodeB, spring)
-        local dx, dy = px - nodeB:getX(), py - nodeB:getY();
+        -- Calculate distance vector and normalise it.
+        local dx, dy = posX - node:getX(), posY - node:getY();
         local distance = math.sqrt(dx * dx + dy * dy);
-
-        -- Normalise vector.
         dx = dx / distance;
         dy = dy / distance;
 
-        -- Calculate spring force and apply it.
-        local force = spring * distance;
-        self:applyForce(dx * force, dy * force);
-    end
+        -- Attract to node if they are connected.
+        local strength;
+        if self:isConnectedTo(node) then
+            strength = FORCE_SPRING * distance;
+            applyForce(dx * strength, dy * strength);
+        end
 
-    ---
-    -- Repels the node from nodeB.
-    -- @param nodeB
-    -- @param charge
-    --
-    function self:repel(nodeB, charge)
-        -- Calculate distance vector.
-        local dx, dy = px - nodeB:getX(), py - nodeB:getY();
-        local distance = math.sqrt(dx * dx + dy * dy);
-
-        -- Normalise vector.
-        dx = dx / distance;
-        dy = dy / distance;
-
-        -- Calculate force's strength and apply it to the vector.
-        local strength = charge * ((self:getMass() * nodeB:getMass()) / (distance * distance));
-        dx = dx * strength;
-        dy = dy * strength;
-
-        self:applyForce(dx, dy);
-    end
-
-    ---
-    -- @param fx
-    -- @param fy
-    --
-    function self:applyForce(fx, fy)
-        ax = clamp(-FORCE_MAX, ax + fx, FORCE_MAX);
-        ay = clamp(-FORCE_MAX, ay + fy, FORCE_MAX);
-    end
-
-    ---
-    -- Apply the calculated acceleration to the node.
-    --
-    function self:move(dt)
-        vx = vx + ax * dt * speed;
-        vy = vy + ay * dt * speed;
-        px = px + vx;
-        py = py + vy;
-        ax, ay = 0, 0; -- Reset acceleration for the next update cycle.
-        return px, py;
+        -- Repel unconnected nodes.
+        strength = FORCE_CHARGE * ((self:getMass() * node:getMass()) / (distance * distance));
+        applyForce(dx * strength, dy * strength);
     end
 
     -- ------------------------------------------------
@@ -254,7 +239,7 @@ function Folder.new(spriteBatch, parent, name, x, y)
     -- ------------------------------------------------
 
     function self:setPosition(nx, ny)
-        px, py = nx, ny;
+        posX, posY = nx, ny;
     end
 
     -- ------------------------------------------------
@@ -262,11 +247,11 @@ function Folder.new(spriteBatch, parent, name, x, y)
     -- ------------------------------------------------
 
     function self:getX()
-        return px;
+        return posX;
     end
 
     function self:getY()
-        return py;
+        return posY;
     end
 
     function self:getChild(name)
@@ -283,7 +268,7 @@ function Folder.new(spriteBatch, parent, name, x, y)
     end
 
     function self:getMass()
-        return 0.01 * (childCount + math.log(math.max(15, radius)));
+        return 0.015 * (childCount + math.log(math.max(SPRITE_SIZE, radius)));
     end
 
     return self;
