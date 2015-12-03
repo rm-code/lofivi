@@ -21,7 +21,7 @@ function Graph.new(showLabels)
 
     local showLabels = showLabels;
 
-    local sprite = love.graphics.newImage('res/img/node.png');
+    local sprite = love.graphics.newImage('res/img/file.png');
     local spritebatch = love.graphics.newSpriteBatch(sprite, 10000, 'stream');
 
     -- ------------------------------------------------

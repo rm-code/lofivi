@@ -9,8 +9,10 @@ local FORCE_MAX = 4;
 local LABEL_FONT = love.graphics.newFont(25);
 local DEFAULT_FONT = love.graphics.newFont(12);
 
-local SPRITE_SIZE = 0.45;
-local SPRITE_OFFSET = 15;
+local SPRITE_SIZE = 24;
+local SPRITE_SCALE_FACTOR = SPRITE_SIZE / 256;
+local SPRITE_OFFSET = 128;
+local MIN_ARC_SIZE = SPRITE_SIZE;
 
 -- ------------------------------------------------
 -- Local Variables
@@ -65,10 +67,8 @@ function Folder.new(spriteBatch, parent, name, x, y)
     -- blueprint of how the files need to be arranged.
     --
     local function createOnionLayers(count)
-        local MIN_ARC_SIZE = 15;
-
         local fileCounter = 0;
-        local radius = -15; -- Radius of the circle around the node.
+        local radius = -SPRITE_SIZE; -- Radius of the circle around the node.
         local layers = {
             { radius = radius, amount = fileCounter }
         };
@@ -84,7 +84,7 @@ function Folder.new(spriteBatch, parent, name, x, y)
             -- of the current layer and the number of nodes that can be placed
             -- on that layer and move to the next layer.
             if arc < MIN_ARC_SIZE then
-                radius = radius + 15;
+                radius = radius + SPRITE_SIZE;
 
                 -- Create a new layer.
                 layers[#layers + 1] = { radius = radius, amount = 1 };
@@ -164,7 +164,7 @@ function Folder.new(spriteBatch, parent, name, x, y)
     function self:update(dt)
         for _, file in pairs(files) do
             spriteBatch:setColor(file:getColor());
-            spriteBatch:add(px + file:getOffsetX(), py + file:getOffsetY(), 0, SPRITE_SIZE, SPRITE_SIZE, SPRITE_OFFSET, SPRITE_OFFSET);
+            spriteBatch:add(px + file:getOffsetX(), py + file:getOffsetY(), 0, SPRITE_SCALE_FACTOR, SPRITE_SCALE_FACTOR, SPRITE_OFFSET, SPRITE_OFFSET);
         end
     end
 
