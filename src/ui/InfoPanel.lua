@@ -4,7 +4,7 @@ local Panel = {};
 -- Constants
 -- ------------------------------------------------
 
-local INFO_MESSAGE = 'Drop a folder onto the application!';
+local INFO_MESSAGE = 'Drag a folder here to create a new graph!';
 
 local LABEL_FONT = love.graphics.newFont(25);
 local DEFAULT_FONT = love.graphics.newFont(12);
