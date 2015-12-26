@@ -4,7 +4,7 @@ local Graph = require('src.graph.Graph');
 local Folder = require('src.graph.Folder');
 local Camera = require('lib.camera.Camera');
 local ConfigReader = require('src.ConfigReader');
-local Panel = require('src.ui.Panel');
+local FilePanel = require('src.ui.FilePanel');
 local InfoPanel = require('src.ui.InfoPanel');
 local Logo = require('src.ui.Logo');
 
@@ -61,7 +61,7 @@ function MainScreen.new()
 
     local clickTime = 0;
 
-    local panel;
+    local filePanel;
     local infoPanel;
     local logo;
 
@@ -150,12 +150,12 @@ function MainScreen.new()
     ---
     -- Creates the panel containing the sorted list of file extensions.
     --
-    local function createPanel(pvisible)
+    local function createFilePanel(pvisible)
         local canvas = ExtensionHandler.createCanvas();
-        local panel = Panel.new(love.graphics.getWidth() - canvas:getWidth(), 0, canvas:getWidth(), canvas:getHeight() + 20);
-        panel:setContent(canvas);
-        panel:setVisible(pvisible);
-        return panel;
+        local filePanel = FilePanel.new(love.graphics.getWidth() - canvas:getWidth(), 0, canvas:getWidth(), canvas:getHeight() + 20);
+        filePanel:setContent(canvas);
+        filePanel:setVisible(pvisible);
+        return filePanel;
     end
 
     ---
@@ -230,7 +230,7 @@ function MainScreen.new()
     local function resetGraph()
         ExtensionHandler.reset();
         graph = createGraph('root', config);
-        panel = createPanel(panel:isVisible());
+        filePanel = createFilePanel(filePanel:isVisible());
         infoPanel = nil;
     end
 
@@ -273,7 +273,7 @@ function MainScreen.new()
         camX, camY = 0, 0;
         ox, oy = 0, 0; -- Camera offset.
 
-        panel = createPanel(config.options.showFileList);
+        filePanel = createFilePanel(config.options.showFileList);
         infoPanel = InfoPanel.new(love.graphics.getWidth() * 0.5, love.graphics.getHeight() * 0.5);
 
         -- Load a logo according to the config file.
@@ -300,7 +300,7 @@ function MainScreen.new()
             graph:draw(camera.rot);
         end);
 
-        panel:draw();
+        filePanel:draw();
 
         logo:draw();
     end
@@ -312,7 +312,7 @@ function MainScreen.new()
         end
 
         graph:update(dt);
-        panel:update(dt);
+        filePanel:update(dt);
 
         -- If the use has clicked on a node it will snap to the mouse position until released.
         if grabbedNode then
@@ -327,13 +327,13 @@ function MainScreen.new()
 
     function self:keypressed(key)
         if key == graph_reset then
-            resetGraph(panel:isVisible());
+            resetGraph(filePanel:isVisible());
         elseif key == take_screenshot then
             createScreenshot();
         elseif key == toggleLabels then
             graph:toggleLabels()
         elseif key == toggleFileList then
-            panel:setVisible(not panel:isVisible());
+            filePanel:setVisible(not filePanel:isVisible());
         elseif key == toggleLogo then
             logo:setVisible(not logo:isVisible());
         elseif key == toggleFullscreen then
@@ -344,10 +344,10 @@ function MainScreen.new()
     end
 
     function self:mousepressed(x, y, b)
-        panel:mousepressed(x, y, b);
+        filePanel:mousepressed(x, y, b);
 
         if b == 1 and clickTime < 0.5 then
-            panel:doubleclick();
+            filePanel:doubleclick();
             clickTime = 0;
         else
             clickTime = 0;
@@ -361,15 +361,15 @@ function MainScreen.new()
     end
 
     function self:mousereleased(x, y, b)
-        panel:mousereleased(x, y, b);
+        filePanel:mousereleased(x, y, b);
     end
 
     function self:mousemoved(x, y, dx, dy)
-        panel:mousemoved(x, y, dx, dy);
+        filePanel:mousemoved(x, y, dx, dy);
     end
 
     function self:wheelmoved(x, y)
-        panel:wheelmoved(x, y);
+        filePanel:wheelmoved(x, y);
     end
 
     function self:directorydropped(path)
