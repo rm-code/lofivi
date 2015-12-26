@@ -16,7 +16,7 @@ return {
         showLabels = false,
         showFileList = true,
 
-        fullscreen = true,      -- Toggle fullscreen
+        fullscreen = false,     -- Toggle fullscreen
         fsType = 'desktop',     -- FullscreenMode ('normal' or 'desktop')
         screenW = 0,
         screenH = 0,
