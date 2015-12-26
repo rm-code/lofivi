@@ -56,8 +56,6 @@ function MainScreen.new()
     local ox, oy;
     local zoom = 1;
 
-    local clickTime = 0;
-
     local filePanel;
 
     local grabbedNode;
@@ -146,9 +144,8 @@ function MainScreen.new()
     -- Creates the panel containing the sorted list of file extensions.
     --
     local function createFilePanel(pvisible)
-        local canvas = ExtensionHandler.createCanvas();
-        local filePanel = FilePanel.new(love.graphics.getWidth() - canvas:getWidth(), 0, canvas:getWidth(), canvas:getHeight() + 20);
-        filePanel:setContent(canvas);
+        local filePanel = FilePanel.new();
+        filePanel:setFiles( ExtensionHandler.getFiles() );
         filePanel:setVisible(pvisible);
         return filePanel;
     end
@@ -293,9 +290,6 @@ function MainScreen.new()
             grabbedNode:setPosition(camera:worldCoords(love.mouse.getPosition()));
         end
 
-        -- Update timer for detecting double clicks.
-        clickTime = math.min(1.0, clickTime + dt);
-
         ox, oy = updateCamera(ox, oy, dt);
     end
 
@@ -316,28 +310,11 @@ function MainScreen.new()
     end
 
     function self:mousepressed(x, y, b)
-        filePanel:mousepressed(x, y, b);
-
-        if b == 1 and clickTime < 0.5 then
-            filePanel:doubleclick();
-            clickTime = 0;
-        else
-            clickTime = 0;
-        end
-
         if b == 1 then
             grabbedNode = graph:grab(camera:worldCoords(x, y));
         elseif b == 2 then
             grabbedNode = nil;
         end
-    end
-
-    function self:mousereleased(x, y, b)
-        filePanel:mousereleased(x, y, b);
-    end
-
-    function self:mousemoved(x, y, dx, dy)
-        filePanel:mousemoved(x, y, dx, dy);
     end
 
     function self:wheelmoved(x, y)
