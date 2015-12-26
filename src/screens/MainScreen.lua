@@ -5,7 +5,6 @@ local Folder = require('src.graph.Folder');
 local Camera = require('lib.camera.Camera');
 local ConfigReader = require('src.ConfigReader');
 local FilePanel = require('src.ui.FilePanel');
-local InfoPanel = require('src.ui.InfoPanel');
 local Logo = require('src.ui.Logo');
 
 -- ------------------------------------------------
@@ -62,7 +61,6 @@ function MainScreen.new()
     local clickTime = 0;
 
     local filePanel;
-    local infoPanel;
     local logo;
 
     local grabbedNode;
@@ -231,7 +229,6 @@ function MainScreen.new()
         ExtensionHandler.reset();
         graph = createGraph('root', config);
         filePanel = createFilePanel(filePanel:isVisible());
-        infoPanel = nil;
     end
 
     -- ------------------------------------------------
@@ -274,7 +271,6 @@ function MainScreen.new()
         ox, oy = 0, 0; -- Camera offset.
 
         filePanel = createFilePanel(config.options.showFileList);
-        infoPanel = InfoPanel.new(love.graphics.getWidth() * 0.5, love.graphics.getHeight() * 0.5);
 
         -- Load a logo according to the config file.
         logo = Logo.new(config.options.logo,
@@ -288,14 +284,11 @@ function MainScreen.new()
         Folder.setSpeed(config.options.nodeSpeed);
 
         love.graphics.setLineWidth(5);
+
+        resetGraph();
     end
 
     function self:draw()
-        if infoPanel then
-            infoPanel:draw();
-            return;
-        end
-
         camera:draw(function()
             graph:draw(camera.rot);
         end);
@@ -306,11 +299,6 @@ function MainScreen.new()
     end
 
     function self:update(dt)
-        if infoPanel then
-            infoPanel:update(dt);
-            return;
-        end
-
         graph:update(dt);
         filePanel:update(dt);
 
