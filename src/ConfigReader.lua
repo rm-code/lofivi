@@ -21,13 +21,6 @@ return {
         screenW = 0,
         screenH = 0,
 
-        showLogo = true,
-        logo = 'logo.png',      -- A custom logo to load.
-        logoPosX = 10,          -- The logo's screen-position.
-        logoPosY = 10,
-        logoScaleX = 1,         -- The logo's scale.
-        logoScaleY = 1,
-
         nodeSpeed = 128,        -- Defines the speed for moving nodes around
     },
 
@@ -45,7 +38,6 @@ return {
         take_screenshot =  ' ', -- Take a screenshot
         toggleLabels =     '1', -- Hide / Show labels
         toggleFileList =   '2', -- Hide / Show file list
-        toggleLogo =       '3', -- Hide / Show logo
         toggleFullscreen = 'f', -- Toggle fullscreen
         exit =             'escape', -- Exit
     },

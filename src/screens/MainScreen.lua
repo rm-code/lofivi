@@ -5,7 +5,6 @@ local Folder = require('src.graph.Folder');
 local Camera = require('lib.camera.Camera');
 local ConfigReader = require('src.ConfigReader');
 local FilePanel = require('src.ui.FilePanel');
-local Logo = require('src.ui.Logo');
 
 -- ------------------------------------------------
 -- Module
@@ -41,7 +40,6 @@ local graph_reset;
 local take_screenshot;
 local toggleLabels;
 local toggleFileList;
-local toggleLogo;
 local toggleFullscreen;
 
 -- ------------------------------------------------
@@ -61,7 +59,6 @@ function MainScreen.new()
     local clickTime = 0;
 
     local filePanel;
-    local logo;
 
     local grabbedNode;
 
@@ -261,7 +258,6 @@ function MainScreen.new()
         take_screenshot = config.keyBindings.take_screenshot;
         toggleLabels = config.keyBindings.toggleLabels;
         toggleFileList = config.keyBindings.toggleFileList;
-        toggleLogo = config.keyBindings.toggleLogo;
         toggleFullscreen = config.keyBindings.toggleFullscreen;
         exit = config.keyBindings.exit;
 
@@ -271,14 +267,6 @@ function MainScreen.new()
         ox, oy = 0, 0; -- Camera offset.
 
         filePanel = createFilePanel(config.options.showFileList);
-
-        -- Load a logo according to the config file.
-        logo = Logo.new(config.options.logo,
-            config.options.logoPosX,
-            config.options.logoPosY,
-            config.options.logoScaleX,
-            config.options.logoScaleY);
-        logo:setVisible(config.options.showLogo);
 
         -- Define the node's speed.
         Folder.setSpeed(config.options.nodeSpeed);
@@ -294,8 +282,6 @@ function MainScreen.new()
         end);
 
         filePanel:draw();
-
-        logo:draw();
     end
 
     function self:update(dt)
@@ -322,8 +308,6 @@ function MainScreen.new()
             graph:toggleLabels()
         elseif key == toggleFileList then
             filePanel:setVisible(not filePanel:isVisible());
-        elseif key == toggleLogo then
-            logo:setVisible(not logo:isVisible());
         elseif key == toggleFullscreen then
             love.window.setFullscreen(not love.window.getFullscreen());
         elseif key == exit then
