@@ -1,33 +1,10 @@
---==================================================================================================
--- Copyright (C) 2015 by Robert Machmer                                                            =
---                                                                                                 =
--- Permission is hereby granted, free of charge, to any person obtaining a copy                    =
--- of this software and associated documentation files (the "Software"), to deal                   =
--- in the Software without restriction, including without limitation the rights                    =
--- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell                       =
--- copies of the Software, and to permit persons to whom the Software is                           =
--- furnished to do so, subject to the following conditions:                                        =
---                                                                                                 =
--- The above copyright notice and this permission notice shall be included in                      =
--- all copies or substantial portions of the Software.                                             =
---                                                                                                 =
--- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR                      =
--- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,                        =
--- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE                     =
--- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER                          =
--- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,                   =
--- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN                       =
--- THE SOFTWARE.                                                                                   =
---==================================================================================================
-
-local Screen = require('lib/screenmanager/Screen');
-local ExtensionHandler = require('src/ExtensionHandler');
-local Graph = require('src/graph/Graph');
-local Folder = require('src/graph/Folder');
-local Camera = require('lib/camera/Camera');
-local ConfigReader = require('src/ConfigReader');
-local Panel = require('src/ui/Panel');
-local Logo = require('src/ui/Logo');
+local Screen = require('lib.screenmanager.Screen');
+local ExtensionHandler = require('src.ExtensionHandler');
+local Graph = require('src.graph.Graph');
+local Folder = require('src.graph.Folder');
+local Camera = require('lib.camera.Camera');
+local ConfigReader = require('src.ConfigReader');
+local FilePanel = require('src.ui.FilePanel');
 
 -- ------------------------------------------------
 -- Module
@@ -38,14 +15,6 @@ local MainScreen = {};
 -- ------------------------------------------------
 -- Constants
 -- ------------------------------------------------
-
-local WARNING_MESSAGE = [[
-To use LoFiVi you will have to place the folder structure you want to be visualised in the root folder of LoFiVi's save folder.
-
-After you have placed it there you can use the R-Key to regenerate the graph.
-
-LoFiVi will now open the file directory in which to place the folder.
-]];
 
 local CAMERA_ROTATION_SPEED = 0.6;
 local CAMERA_TRANSLATION_SPEED = 400;
@@ -71,7 +40,6 @@ local graph_reset;
 local take_screenshot;
 local toggleLabels;
 local toggleFileList;
-local toggleLogo;
 local toggleFullscreen;
 
 -- ------------------------------------------------
@@ -88,10 +56,7 @@ function MainScreen.new()
     local ox, oy;
     local zoom = 1;
 
-    local clickTime = 0;
-
-    local panel;
-    local logo;
+    local filePanel;
 
     local grabbedNode;
 
@@ -127,15 +92,11 @@ function MainScreen.new()
     end
 
     ---
-    -- Creates the necessary folders if they don't exist yet, shows a
-    -- message box to the user and opens the root folder in a
-    -- finder / explorer window.
+    -- Creates the root folder we'll mount our directories to later on.
     --
     local function setUpFolders()
-        if not love.filesystem.isDirectory('root') or #love.filesystem.getDirectoryItems('root') == 0 then
+        if not love.filesystem.isDirectory('root') then
             love.filesystem.createDirectory('root');
-            love.window.showMessageBox('No content found.', WARNING_MESSAGE, 'warning', false);
-            love.system.openURL('file://' .. love.filesystem.getSaveDirectory() .. '/root');
         end
     end
 
@@ -175,18 +136,18 @@ function MainScreen.new()
     local function createScreenshot()
         local filename = os.time() .. '.png';
         love.filesystem.createDirectory('screenshots');
-        love.graphics.newScreenshot():encode('screenshots/' .. filename);
+        love.graphics.newScreenshot():encode('png', 'screenshots/' .. filename);
         print('Created screenshot: ' .. filename);
     end
 
     ---
     -- Creates the panel containing the sorted list of file extensions.
     --
-    local function createPanel()
-        local canvas = ExtensionHandler.createCanvas();
-        local panel = Panel.new(love.graphics.getWidth() - canvas:getWidth(), 0, canvas:getWidth(), canvas:getHeight() + 20);
-        panel:setContent(canvas);
-        return panel;
+    local function createFilePanel(pvisible)
+        local filePanel = FilePanel.new();
+        filePanel:setFiles( ExtensionHandler.getFiles() );
+        filePanel:setVisible(pvisible);
+        return filePanel;
     end
 
     ---
@@ -258,6 +219,12 @@ function MainScreen.new()
         return ox, oy;
     end
 
+    local function resetGraph()
+        ExtensionHandler.reset();
+        graph = createGraph('root', config);
+        filePanel = createFilePanel(filePanel:isVisible());
+    end
+
     -- ------------------------------------------------
     -- Public Functions
     -- ------------------------------------------------
@@ -288,95 +255,75 @@ function MainScreen.new()
         take_screenshot = config.keyBindings.take_screenshot;
         toggleLabels = config.keyBindings.toggleLabels;
         toggleFileList = config.keyBindings.toggleFileList;
-        toggleLogo = config.keyBindings.toggleLogo;
         toggleFullscreen = config.keyBindings.toggleFullscreen;
+        exit = config.keyBindings.exit;
 
         -- Create the camera.
         camera = Camera.new();
         camX, camY = 0, 0;
         ox, oy = 0, 0; -- Camera offset.
 
-        graph = createGraph('root', config);
-        panel = createPanel();
-        panel:setVisible(config.options.showFileList);
-
-        -- Load a logo according to the config file.
-        logo = Logo.new(config.options.logo,
-            config.options.logoPosX,
-            config.options.logoPosY,
-            config.options.logoScaleX,
-            config.options.logoScaleY);
-        logo:setVisible(config.options.showLogo);
+        filePanel = createFilePanel(config.options.showFileList);
 
         -- Define the node's speed.
         Folder.setSpeed(config.options.nodeSpeed);
+
+        love.graphics.setLineWidth(5);
+
+        resetGraph();
     end
 
     function self:draw()
         camera:draw(function()
-            graph:draw();
+            graph:draw(camera.rot);
         end);
 
-        panel:draw();
-        logo:draw();
+        filePanel:draw();
     end
 
     function self:update(dt)
         graph:update(dt);
-        panel:update(dt);
+        filePanel:update(dt);
 
         -- If the use has clicked on a node it will snap to the mouse position until released.
         if grabbedNode then
             grabbedNode:setPosition(camera:worldCoords(love.mouse.getPosition()));
         end
 
-        -- Update timer for detecting double clicks.
-        clickTime = math.min(1.0, clickTime + dt);
-
         ox, oy = updateCamera(ox, oy, dt);
     end
 
     function self:keypressed(key)
         if key == graph_reset then
-            ExtensionHandler.reset();
-            graph = createGraph('root', config);
-            panel = createPanel();
+            resetGraph(filePanel:isVisible());
         elseif key == take_screenshot then
             createScreenshot();
         elseif key == toggleLabels then
             graph:toggleLabels()
         elseif key == toggleFileList then
-            panel:setVisible(not panel:isVisible());
-        elseif key == toggleLogo then
-            logo:setVisible(not logo:isVisible());
+            filePanel:setVisible(not filePanel:isVisible());
         elseif key == toggleFullscreen then
             love.window.setFullscreen(not love.window.getFullscreen());
+        elseif key == exit then
+            love.event.quit();
         end
     end
 
     function self:mousepressed(x, y, b)
-        panel:mousepressed(x, y, b);
-
-        if b == 'l' and clickTime < 0.5 then
-            panel:doubleclick();
-            clickTime = 0;
-        else
-            clickTime = 0;
-        end
-
-        if b == 'l' then
+        if b == 1 then
             grabbedNode = graph:grab(camera:worldCoords(x, y));
-        elseif b == 'r' then
+        elseif b == 2 then
             grabbedNode = nil;
         end
     end
 
-    function self:mousereleased(x, y, b)
-        panel:mousereleased(x, y, b);
+    function self:wheelmoved(x, y)
+        filePanel:wheelmoved(x, y);
     end
 
-    function self:mousemoved(x, y, dx, dy)
-        panel:mousemoved(x, y, dx, dy);
+    function self:directorydropped(path)
+        love.filesystem.mount(path, 'root');
+        resetGraph();
     end
 
     return self;

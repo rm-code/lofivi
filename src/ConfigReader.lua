@@ -1,25 +1,3 @@
---==================================================================================================
--- Copyright (C) 2015 by Robert Machmer                                                            =
---                                                                                                 =
--- Permission is hereby granted, free of charge, to any person obtaining a copy                    =
--- of this software and associated documentation files (the "Software"), to deal                   =
--- in the Software without restriction, including without limitation the rights                    =
--- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell                       =
--- copies of the Software, and to permit persons to whom the Software is                           =
--- furnished to do so, subject to the following conditions:                                        =
---                                                                                                 =
--- The above copyright notice and this permission notice shall be included in                      =
--- all copies or substantial portions of the Software.                                             =
---                                                                                                 =
--- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR                      =
--- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,                        =
--- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE                     =
--- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER                          =
--- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,                   =
--- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN                       =
--- THE SOFTWARE.                                                                                   =
---==================================================================================================
-
 local ConfigReader = {};
 
 -- ------------------------------------------------
@@ -38,17 +16,10 @@ return {
         showLabels = false,
         showFileList = true,
 
-        fullscreen = true,      -- Toggle fullscreen
+        fullscreen = false,     -- Toggle fullscreen
         fsType = 'desktop',     -- FullscreenMode ('normal' or 'desktop')
         screenW = 0,
         screenH = 0,
-
-        showLogo = true,
-        logo = 'logo.png',      -- A custom logo to load.
-        logoPosX = 10,          -- The logo's screen-position.
-        logoPosY = 10,
-        logoScaleX = 1,         -- The logo's scale.
-        logoScaleY = 1,
 
         nodeSpeed = 128,        -- Defines the speed for moving nodes around
     },
@@ -64,11 +35,11 @@ return {
         camera_zoomIn =    '+', -- Zoom in
         camera_zoomOut =   '-', -- Zoom out
         graph_reset =      'r', -- Reloads the whole graph
-        take_screenshot =  ' ', -- Take a screenshot
+        take_screenshot =  'space', -- Take a screenshot
         toggleLabels =     '1', -- Hide / Show labels
         toggleFileList =   '2', -- Hide / Show file list
-        toggleLogo =       '3', -- Hide / Show logo
         toggleFullscreen = 'f', -- Toggle fullscreen
+        exit =             'escape', -- Exit
     },
 
     -- Can be used to assign a specific color to a file extension (RGB or RGBA).
