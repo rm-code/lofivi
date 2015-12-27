@@ -35,7 +35,7 @@ return {
         camera_zoomIn =    '+', -- Zoom in
         camera_zoomOut =   '-', -- Zoom out
         graph_reset =      'r', -- Reloads the whole graph
-        take_screenshot =  ' ', -- Take a screenshot
+        take_screenshot =  'space', -- Take a screenshot
         toggleLabels =     '1', -- Hide / Show labels
         toggleFileList =   '2', -- Hide / Show file list
         toggleFullscreen = 'f', -- Toggle fullscreen

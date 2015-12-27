@@ -138,7 +138,7 @@ function MainScreen.new()
     local function createScreenshot()
         local filename = os.time() .. '.png';
         love.filesystem.createDirectory('screenshots');
-        love.graphics.newScreenshot():encode('screenshots/' .. filename);
+        love.graphics.newScreenshot():encode('png', 'screenshots/' .. filename);
         print('Created screenshot: ' .. filename);
     end
 
