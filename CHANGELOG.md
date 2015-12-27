@@ -2,11 +2,16 @@
 
 --------
 
-## Version xxxx - unreleased
+## Version 0159 - 2015-12-27
 
 ### Additions
 - Folders can be dropped directly on LoFiVi to be visualised
 - Added new file sprites
+- Added controls for exiting
+
+### Removals
+- Removed logo panel
+- Removed message when program is starting
 
 ### Fixes
 - Fixed [#8](https://github.com/rm-code/lofivi/issues/8) - Replace outdated love.graphics.setBlendMode variant
@@ -15,11 +20,14 @@
 - Fixed [#1](https://github.com/rm-code/lofivi/issues/1) - Labels no longer rotate with the camera
 
 ### Other Changes
+- Updated to work with LÖVE 0.10.0
 - Improved physics calculations
+- Increased width of lines
+- Rewrote code for physics
 
 --------
 
-## Version 0121 - 29/03/2015
+## Version 0121 - 2015-03-29
 
 ### Additions
 - Added option to de-/activate fullscreen mode in the config file
@@ -39,7 +47,7 @@
 
 --------
 
-## Version 0085 - 02/03/2015
+## Version 0085 - 2015-03-02
 
 ### Additions
 - Added spritebatch and use it to draw files of the graph
@@ -62,7 +70,7 @@
 
 --------
 
-## Version 0060 - 23/02/2015
+## Version 0060 - 2015-02-23
 
 ### Additions
 - Added a config file
@@ -83,7 +91,7 @@
 
 --------
 
-## Version 0039 - 20/02/2015
+## Version 0039 - 2015-02-20
 
 ### Additions
 - Added repulsion force between all (and not just connected) nodes
@@ -96,7 +104,7 @@
 
 --------
 
-## Version 0025 - 18/02/2015
+## Version 0025 - 2015-02-18
 
 - Recursively read files and folders from the save directory and create a graph
 - Added attraction and repulsion forces between connected folders to form a basic graph layout
