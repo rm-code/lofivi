@@ -19,8 +19,6 @@ function Graph.new(showLabels)
     local nodes;
     local minX, maxX, minY, maxY;
 
-    local showLabels = showLabels;
-
     local sprite = love.graphics.newImage('res/img/file.png');
     local spritebatch = love.graphics.newSpriteBatch(sprite, 10000, 'stream');
 
