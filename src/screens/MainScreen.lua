@@ -41,6 +41,7 @@ local take_screenshot;
 local toggleLabels;
 local toggleFileList;
 local toggleFullscreen;
+local exit;
 
 -- ------------------------------------------------
 -- Constructor
@@ -70,13 +71,13 @@ function MainScreen.new()
     -- as a sequence.
     -- @param dir
     --
-    local function recursivelyGetDirectoryItems(dir)
+    local function recursivelyGetDirectoryItems( dir )
         local pathsList = {};
 
-        local function recurse(dir)
-            local items = love.filesystem.getDirectoryItems(dir);
+        local function recurse( rdir )
+            local items = love.filesystem.getDirectoryItems( rdir );
             for _, item in ipairs(items) do
-                local file = dir .. "/" .. item;
+                local file = rdir .. "/" .. item;
                 if love.filesystem.isDirectory(file) then
                     recurse(file);
                 elseif love.filesystem.isFile(file) then
@@ -86,7 +87,7 @@ function MainScreen.new()
         end
 
         -- Start recursion.
-        recurse(dir);
+        recurse( dir );
 
         return pathsList;
     end
@@ -144,10 +145,10 @@ function MainScreen.new()
     -- Creates the panel containing the sorted list of file extensions.
     --
     local function createFilePanel(pvisible)
-        local filePanel = FilePanel.new();
-        filePanel:setFiles( ExtensionHandler.getFiles() );
-        filePanel:setVisible(pvisible);
-        return filePanel;
+        local newfilePanel = FilePanel.new();
+        newfilePanel:setFiles( ExtensionHandler.getFiles() );
+        newfilePanel:setVisible(pvisible);
+        return newfilePanel;
     end
 
     ---
@@ -157,15 +158,15 @@ function MainScreen.new()
     -- @param path
     -- @param config
     --
-    local function createGraph(path, config)
+    local function createGraph(path, cfg)
         -- Read the files and folders and checks if some of them will be ignored.
-        local pathsList = ignoreFiles(recursivelyGetDirectoryItems(path), config.ignore);
+        local pathsList = ignoreFiles(recursivelyGetDirectoryItems(path), cfg.ignore);
 
         -- Create a graph using the edited list of files and folders.
-        local graph = Graph.new(config.options.showLabels);
-        graph:init(pathsList);
+        local newGraph = Graph.new(cfg.options.showLabels);
+        newGraph:init(pathsList);
 
-        return graph;
+        return newGraph;
     end
 
     ---
@@ -174,7 +175,7 @@ function MainScreen.new()
     -- @param oy - The current offset of the camera on the y-axis.
     -- @param dt
     --
-    local function updateCamera(ox, oy, dt)
+    local function updateCamera( offsetX, offsetY, dt )
         -- Zoom.
         if love.keyboard.isDown(camera_zoomIn) then
             zoom = zoom + CAMERA_ZOOM_SPEED * dt;
@@ -207,16 +208,16 @@ function MainScreen.new()
         end
 
         -- Take the camera rotation into account when calculating the new offset.
-        ox = ox + (math.cos(-camera.rot) * dx - math.sin(-camera.rot) * dy);
-        oy = oy + (math.sin(-camera.rot) * dx + math.cos(-camera.rot) * dy);
+        offsetX = offsetX + (math.cos(-camera.rot) * dx - math.sin(-camera.rot) * dy);
+        offsetY = offsetY + (math.sin(-camera.rot) * dx + math.cos(-camera.rot) * dy);
 
         -- Gradually move the camera to the target position.
         local cx, cy = graph:getCenter();
-        camX = camX - (camX - math.floor(cx + ox)) * dt * CAMERA_TRACKING_SPEED;
-        camY = camY - (camY - math.floor(cy + oy)) * dt * CAMERA_TRACKING_SPEED;
+        camX = camX - (camX - math.floor(cx + offsetX)) * dt * CAMERA_TRACKING_SPEED;
+        camY = camY - (camY - math.floor(cy + offsetY)) * dt * CAMERA_TRACKING_SPEED;
         camera:lookAt(camX, camY);
 
-        return ox, oy;
+        return offsetX, offsetY;
     end
 
     local function resetGraph()
