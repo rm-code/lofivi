@@ -32,8 +32,8 @@ return {
         camera_e =         'd', -- Move camera right
         camera_rotateL =   'q', -- Rotate camera left
         camera_rotateR =   'e', -- Rotate camera right
-        camera_zoomIn =    '+', -- Zoom in
-        camera_zoomOut =   '-', -- Zoom out
+        camera_zoomIn =    'up', -- Zoom in
+        camera_zoomOut =   'down', -- Zoom out
         graph_reset =      'r', -- Reloads the whole graph
         take_screenshot =  'space', -- Take a screenshot
         toggleLabels =     '1', -- Hide / Show labels
