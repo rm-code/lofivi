@@ -47,7 +47,7 @@ function FilePanel.new()
         love.graphics.setColor(255, 255, 255);
     end
 
-    function self:update(dt)
+    function self:update()
         scrollVelocity = scrollVelocity * 0.9;
         scrolly = scrolly + scrollVelocity;
         scrolly = math.min(0, math.max( scrolly, love.graphics.getHeight() - contentHeight - 2 * LINE_HEIGHT));
@@ -58,7 +58,7 @@ function FilePanel.new()
     -- @param dx
     -- @param dy
     --
-    function self:wheelmoved( dx, dy )
+    function self:wheelmoved( _, dy )
         scrollVelocity = scrollVelocity + dy;
     end
 
@@ -74,7 +74,7 @@ function FilePanel.new()
         files = nfiles;
 
         totalFiles = 0;
-        for i, v in ipairs(files) do
+        for _, v in ipairs(files) do
             totalFiles = totalFiles + v.count;
         end
         contentHeight = #files * LINE_HEIGHT;
