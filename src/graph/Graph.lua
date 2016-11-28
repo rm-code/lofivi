@@ -26,10 +26,6 @@ function Graph.new(showLabels)
     -- Private Functions
     -- ------------------------------------------------
 
-    local function updateBoundaries(minX, maxX, minY, maxY, nx, ny)
-        return math.min(nx, minX), math.max(nx, maxX), math.min(ny, minY), math.max(ny, maxY);
-    end
-
     ---
     -- Creates a file tree based on a sequence containing
     -- paths to files and subfolders. Each folder is a folder
