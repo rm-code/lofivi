@@ -1,5 +1,10 @@
 # LoFiVi
 
+[![Version](https://img.shields.io/badge/Version-0159-blue.svg)](https://github.com/rm-code/lofivi/releases/latest)
+[![LOVE](https://img.shields.io/badge/L%C3%96VE-0.10.2-EA316E.svg)](http://love2d.org/)
+[![License](http://img.shields.io/badge/Licence-MIT-brightgreen.svg)](LICENSE.md)
+[![Build Status](https://travis-ci.org/rm-code/lofivi.svg?branch=develop)](https://travis-ci.org/rm-code/lofivi)
+
 LoFiVi uses a force-directed graph to visualise folder structures. It was written from scratch using [Lua](http://www.lua.org/) and the [LÖVE](https://love2d.org/) framework.
 
 Like its big sister [LoGiVi](https://github.com/rm-code/logivi), LoFiVi was inspired by other visualisation software like [Gource](https://code.google.com/p/gource/) or [Cytoscape](http://www.cytoscape.org/). I always was quite intrigued by the beautiful graphs they created and therefore wanted to learn how to make use of the [force-directed layout](http://en.wikipedia.org/wiki/Force-directed_graph_drawing) myself.
