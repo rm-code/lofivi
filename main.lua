@@ -55,11 +55,10 @@ function love.load()
     print("===================")
 
     local screens = {
-        info = require('src.screens.InfoScreen');
         main = require('src.screens.MainScreen');
     };
 
-    ScreenManager.init(screens, 'info');
+    ScreenManager.init( screens, 'main' );
 end
 
 function love.draw()

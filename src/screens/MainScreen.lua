@@ -1,7 +1,6 @@
 local Screen = require('lib.screenmanager.Screen');
-local ExtensionHandler = require('src.ExtensionHandler');
+local FileManager = require('src.FileManager');
 local Graph = require('src.graph.Graph');
-local Folder = require('src.graph.Folder');
 local Camera = require('lib.camera.Camera');
 local ConfigReader = require('src.ConfigReader');
 local FilePanel = require('src.ui.FilePanel');
@@ -15,6 +14,8 @@ local MainScreen = {};
 -- ------------------------------------------------
 -- Constants
 -- ------------------------------------------------
+
+local MOUNT_FOLDER = 'tmp';
 
 local CAMERA_ROTATION_SPEED = 0.6;
 local CAMERA_TRANSLATION_SPEED = 400;
@@ -71,33 +72,15 @@ function MainScreen.new()
     -- as a sequence.
     -- @param dir
     --
-    local function recursivelyGetDirectoryItems( dir )
-        local pathsList = {};
-
-        local function recurse( rdir )
-            local items = love.filesystem.getDirectoryItems( rdir );
-            for _, item in ipairs(items) do
-                local file = rdir .. "/" .. item;
-                if love.filesystem.isDirectory(file) then
-                    recurse(file);
-                elseif love.filesystem.isFile(file) then
-                    pathsList[#pathsList + 1] = file;
-                end
+    local function recursivelyGetDirectoryItems( paths, path )
+        local files = love.filesystem.getDirectoryItems( path )
+        for _, p in pairs( files ) do
+            local npath = string.format( '%s/%s', path, p );
+            if love.filesystem.isDirectory( npath ) then
+                recursivelyGetDirectoryItems( paths, npath );
+            else
+                paths[#paths + 1] = npath;
             end
-        end
-
-        -- Start recursion.
-        recurse( dir );
-
-        return pathsList;
-    end
-
-    ---
-    -- Creates the root folder we'll mount our directories to later on.
-    --
-    local function setUpFolders()
-        if not love.filesystem.isDirectory('root') then
-            love.filesystem.createDirectory('root');
         end
     end
 
@@ -111,7 +94,6 @@ function MainScreen.new()
     local function ignoreFiles(paths, ignoreList)
         local newList = {};
         for _, path in ipairs(paths) do
-
             -- Check if one of the patterns matches the path.
             local ignore = false;
             for _, pattern in ipairs(ignoreList) do
@@ -146,7 +128,7 @@ function MainScreen.new()
     --
     local function createFilePanel(pvisible)
         local newfilePanel = FilePanel.new();
-        newfilePanel:setFiles( ExtensionHandler.getFiles() );
+        newfilePanel:setFiles( FileManager.getSortedList() );
         newfilePanel:setVisible(pvisible);
         return newfilePanel;
     end
@@ -156,15 +138,17 @@ function MainScreen.new()
     -- paths based on the ignore list specified in the config file.
     -- It then proceeds to generate the graph based on the files and folders.
     -- @param path
-    -- @param config
     --
-    local function createGraph(path, cfg)
+    local function createGraph()
+        local paths = {};
+
         -- Read the files and folders and checks if some of them will be ignored.
-        local pathsList = ignoreFiles(recursivelyGetDirectoryItems(path), cfg.ignore);
+        recursivelyGetDirectoryItems( paths, MOUNT_FOLDER );
+        paths = ignoreFiles( paths, config.ignore );
 
         -- Create a graph using the edited list of files and folders.
-        local newGraph = Graph.new(cfg.options.showLabels);
-        newGraph:init(pathsList);
+        local newGraph = Graph.new( config.options.showLabels );
+        newGraph:init( paths );
 
         return newGraph;
     end
@@ -221,9 +205,9 @@ function MainScreen.new()
     end
 
     local function resetGraph()
-        ExtensionHandler.reset();
-        graph = createGraph('root', config);
-        filePanel = createFilePanel(filePanel:isVisible());
+        FileManager.reset();
+        graph = createGraph();
+        -- filePanel = createFilePanel(filePanel:isVisible());
     end
 
     -- ------------------------------------------------
@@ -231,9 +215,6 @@ function MainScreen.new()
     -- ------------------------------------------------
 
     function self:init()
-        -- Set up the necessary folders.
-        setUpFolders();
-
         -- Load configuration file and set options.
         config = ConfigReader.init();
         love.window.setMode(config.options.screenW, config.options.screenH, {
@@ -241,7 +222,7 @@ function MainScreen.new()
             fullscreentype = config.options.fsType,
         });
         love.graphics.setBackgroundColor(config.options.bgColor);
-        ExtensionHandler.setColorTable(config.fileColors);
+        FileManager.setColorTable(config.fileColors);
 
         -- Load key bindings.
         camera_zoomIn = config.keyBindings.camera_zoomIn;
@@ -266,15 +247,14 @@ function MainScreen.new()
 
         filePanel = createFilePanel(config.options.showFileList);
 
-        -- Define the node's speed.
-        Folder.setSpeed(config.options.nodeSpeed);
-
         love.graphics.setLineWidth(5);
-
-        resetGraph();
     end
 
     function self:draw()
+        if not graph then
+            return;
+        end
+
         camera:draw(function()
             graph:draw(camera.rot);
         end);
@@ -283,6 +263,10 @@ function MainScreen.new()
     end
 
     function self:update(dt)
+        if not graph then
+            return;
+        end
+
         graph:update(dt);
         filePanel:update(dt);
 
@@ -322,8 +306,9 @@ function MainScreen.new()
         filePanel:wheelmoved(x, y);
     end
 
-    function self:directorydropped(path)
-        love.filesystem.mount(path, 'root');
+    function self:directorydropped( path )
+        love.filesystem.createDirectory( MOUNT_FOLDER )
+        love.filesystem.mount( path, MOUNT_FOLDER )
         resetGraph();
     end
 

@@ -1,6 +1,5 @@
-local Folder = require('src.graph.Folder');
-local File = require('src.graph.File');
-local ExtensionHandler = require('src.ExtensionHandler');
+local Graphoon = require( 'lib.graphoon.Graphoon' ).Graph;
+local Node = require( 'src.graph.Node' );
 
 -- ------------------------------------------------
 -- Module
@@ -9,15 +8,22 @@ local ExtensionHandler = require('src.ExtensionHandler');
 local Graph = {};
 
 -- ------------------------------------------------
+-- Constants
+-- ------------------------------------------------
+
+local ROOT_FOLDER  = '';
+
+-- ------------------------------------------------
 -- Constructor
 -- ------------------------------------------------
 
 function Graph.new(showLabels)
     local self = {};
 
-    local tree;
-    local nodes;
-    local minX, maxX, minY, maxY;
+    Graphoon.setNodeClass( Node );
+
+    local graph = Graphoon.new();
+    graph:addNode( ROOT_FOLDER, love.graphics.getWidth() * 0.5, love.graphics.getHeight() * 0.5, true );
 
     local sprite = love.graphics.newImage('res/img/file.png');
     local spritebatch = love.graphics.newSpriteBatch(sprite, 10000, 'stream');
@@ -27,98 +33,99 @@ function Graph.new(showLabels)
     -- ------------------------------------------------
 
     ---
-    -- Creates a file tree based on a sequence containing
-    -- paths to files and subfolders. Each folder is a folder
-    -- node which has children folder nodes and files.
-    -- @param paths
+    -- Returns a random sign (+ or -).
+    -- @return (number) Randomly returns either -1 or 1.
     --
-    local function createGraph(paths)
-        local nodes = { Folder.new(spritebatch, nil, 'root', love.graphics.getWidth() * 0.5, love.graphics.getHeight() * 0.5) };
-        local tree = nodes[#nodes];
-        local fileCounter = 0;
+    local function randomSign()
+        return love.math.random( 0, 1 ) == 0 and -1 or 1;
+    end
 
-        for i = 1, #paths do
-            local target;
+    ---
+    -- Spawns a new node.
+    -- @param name     (string) The node's name based on the folder's name.
+    -- @param id       (string) The node's unqiue id based on the folder's full path.
+    -- @param parent   (Node)   The parent of the node to spawn.
+    -- @param parentID (string) The parent's id.
+    -- @return         (Node)   The newly spawned node.
+    --
+    local function spawnNode( name, id, parent, parentID )
+        local parentX, parentY = parent:getPosition();
+        local offsetX = love.math.random( 100 ) * randomSign();
+        local offsetY = love.math.random( 100 ) * randomSign();
+        return graph:addNode( id, parentX + offsetX, parentY + offsetY, false, parentID, spritebatch, name );
+    end
 
-            -- Split the path using pattern matching.
-            local splitPath = {};
-            for part in paths[i]:gmatch('[^/]+') do
-                splitPath[#splitPath + 1] = part;
+    ---
+    -- Creates all nodes belonging to a path if they don't exist yet.
+    -- @param path (string) The path to resolve.
+    -- @return     (Node)   The last node in the path.
+    --
+    local function createNodes( path )
+        local parentID = ROOT_FOLDER;
+        for folder in path:gmatch('[^/]+') do
+            local nodeID = parentID .. '/' .. folder;
+
+            if love.filesystem.isFile( nodeID ) then
+                local parentNode = graph:getNode( parentID );
+                parentNode:addFile( folder:match( '(.+)%.(.+)' ))
+            elseif not graph:hasNode( nodeID ) then
+                local parentNode = graph:getNode( parentID );
+                spawnNode( folder, nodeID, parentNode, parentID );
+                graph:connectIDs( parentID, nodeID );
             end
-
-            -- Iterate over the split parts and create folders and files.
-            for i = 1, #splitPath do
-                local name = splitPath[i];
-                if name == 'root' then
-                    target = nodes[1];
-                elseif i == #splitPath then
-                    local col, ext = ExtensionHandler.add(name); -- Get a colour for this file.
-                    target:addFile(name, File.new(ext, col));
-                    fileCounter = fileCounter + 1;
-                else
-                    -- Get the next folder as a target. If that folder doesn't exist in our graph yet, create it first.
-                    local nt = target:getChild(name);
-                    if not nt then
-                        -- Calculate random offset at which to place the new folder node.
-                        local ox = love.math.random(5, 40) * (love.math.random(0, 1) == 0 and -1 or 1);
-                        local oy = love.math.random(5, 40) * (love.math.random(0, 1) == 0 and -1 or 1);
-
-                        nodes[#nodes + 1] = Folder.new(spritebatch, target, name, target:getX() + ox, target:getY() + oy);
-                        target = target:addChild(name, nodes[#nodes]);
-                    else
-                        target = nt;
-                    end
-                end
-            end
+            parentID = nodeID;
         end
+        return graph:getNode( path );
+    end
 
-        print('Created ' .. #nodes .. ' folders and ' .. fileCounter .. ' files.');
-
-        return tree, nodes;
+    local function createGraph( paths )
+        for _, path in ipairs( paths ) do
+            createNodes( path );
+        end
     end
 
     -- ------------------------------------------------
     -- Public Functions
     -- ------------------------------------------------
 
-    function self:init(paths)
-        tree, nodes = createGraph(paths);
-        minX, minY, maxX, maxY = tree:getX(), tree:getX(), tree:getY(), tree:getY();
-    end
-
-    function self:draw(rotation)
-        tree:draw(rotation, showLabels);
-        love.graphics.draw(spritebatch);
-    end
-
-    function self:update(dt)
-        spritebatch:clear();
-
-        for i = 1, #nodes do
-            for j = 1, #nodes do
-                nodes[i]:calculateForces(nodes[j]);
-            end
-            nodes[i]:update(dt);
-        end
-
-        minX, maxX, minY, maxY = tree:getX(), tree:getX(), tree:getY(), tree:getY();
+    function self:init( paths )
+        createGraph( paths );
     end
 
     function self:toggleLabels()
         showLabels = not showLabels;
     end
 
-    function self:grab(x, y)
-        for i = 1, #nodes do
-            local node = nodes[i];
-            local margin = 15;
-            if x < node:getX() + margin
-                    and x > node:getX() - margin
-                    and y < node:getY() + margin
-                    and y > node:getY() - margin then
-                return node;
+    ---
+    -- Draws the graph.
+    -- @param camrot   (number) The current camera rotation.
+    -- @param camscale (number) The current camera scale.
+    --
+    function self:draw( camrot, camscale )
+        graph:draw( function( node )
+            if showLabels then
+                -- TODO Labels
             end
-        end
+        end,
+        function( edge )
+            love.graphics.setColor( 60, 60, 60, 255 );
+            love.graphics.setLineWidth( 5 );
+            love.graphics.line( edge.origin:getX(), edge.origin:getY(), edge.target:getX(), edge.target:getY() );
+            love.graphics.setLineWidth( 1 );
+            love.graphics.setColor( 255, 255, 255, 255 );
+        end);
+        love.graphics.draw( spritebatch );
+    end
+
+    ---
+    -- Updates the graph.
+    -- @param dt (number) The delta time passed since the last frame.
+    --
+    function self:update( dt )
+        spritebatch:clear();
+        graph:update( dt, function( node )
+            node:update( dt );
+        end);
     end
 
     -- ------------------------------------------------
@@ -126,7 +133,7 @@ function Graph.new(showLabels)
     -- ------------------------------------------------
 
     function self:getCenter()
-        return minX + (maxX - minX) * 0.5, minY + (maxY - minY) * 0.5;
+        return graph:getCenter();
     end
 
     return self;
