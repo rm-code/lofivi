@@ -140,6 +140,10 @@ function Graph.new(showLabels)
         return graph:getCenter();
     end
 
+    function self:getNodeAt( x, y, range )
+        return graph:getNodeAt( x, y, range );
+    end
+
     return self;
 end
 

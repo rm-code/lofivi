@@ -272,7 +272,7 @@ function MainScreen.new()
 
         -- If the use has clicked on a node it will snap to the mouse position until released.
         if grabbedNode then
-            grabbedNode:setPosition(camera:worldCoords(love.mouse.getPosition()));
+            grabbedNode:setPosition( camera:worldCoords( love.mouse.getPosition() ));
         end
 
         ox, oy = updateCamera(ox, oy, dt);
@@ -294,10 +294,18 @@ function MainScreen.new()
         end
     end
 
-    function self:mousepressed(x, y, b)
-        if b == 1 then
-            grabbedNode = graph:grab(camera:worldCoords(x, y));
-        elseif b == 2 then
+    function self:mousepressed( _, _, button )
+        local mx, my = camera:mousepos();
+        local node = graph:getNodeAt( mx, my, 30 );
+
+        if not node then
+            grabbedNode = nil;
+            return;
+        end
+
+        if button == 1 and not grabbedNode then
+            grabbedNode = node;
+        elseif button == 2 then
             grabbedNode = nil;
         end
     end
