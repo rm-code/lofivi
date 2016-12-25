@@ -313,8 +313,8 @@ function MainScreen.new()
         end
     end
 
-    function self:wheelmoved(x, y)
-        filePanel:wheelmoved(x, y);
+    function self:wheelmoved( x, y )
+        filePanel:scroll( x, y );
     end
 
     function self:directorydropped( path )
