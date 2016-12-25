@@ -107,7 +107,7 @@ function Graph.new(showLabels)
         graph:draw( function( node )
             love.graphics.setFont( LABEL_FONT );
             love.graphics.setColor( 255, 255, 255, 105 );
-            love.graphics.print( node:getName(), node:getX(), node:getY(), -camrot, 1, 1, -node:getRadius(), -node:getRadius() );
+            love.graphics.print( node:getName(), node:getX(), node:getY(), -camrot, 1 / camscale, 1 / camscale, -node:getRadius() * camscale, -node:getRadius() * camscale );
             love.graphics.setColor( 255, 255, 255, 255 );
             love.graphics.setFont( DEFAULT_FONT );
         end,

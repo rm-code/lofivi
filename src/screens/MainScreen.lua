@@ -256,7 +256,7 @@ function MainScreen.new()
         end
 
         camera:draw(function()
-            graph:draw(camera.rot);
+            graph:draw( camera.rot, camera.scale );
         end);
 
         filePanel:draw();
