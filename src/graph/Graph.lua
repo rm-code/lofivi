@@ -11,7 +11,6 @@ local Graph = {};
 -- Constants
 -- ------------------------------------------------
 
-local ROOT_FOLDER  = '';
 local LABEL_FONT   = love.graphics.newFont( 25 );
 local DEFAULT_FONT = love.graphics.newFont( 12 );
 
@@ -28,7 +27,6 @@ function Graph.new(showLabels)
     local spritebatch = love.graphics.newSpriteBatch(sprite, 10000, 'stream');
 
     local graph = Graphoon.new();
-    graph:addNode( ROOT_FOLDER, love.graphics.getWidth() * 0.5, love.graphics.getHeight() * 0.5, true, nil, spritebatch, ROOT_FOLDER );
 
     -- ------------------------------------------------
     -- Private Functions
@@ -40,6 +38,17 @@ function Graph.new(showLabels)
     --
     local function randomSign()
         return love.math.random( 0, 1 ) == 0 and -1 or 1;
+    end
+
+    ---
+    -- Spawns a new node.
+    -- @param name     (string) The node's name based on the folder's name.
+    -- @param id       (string) The node's unqiue id based on the folder's full path.
+    -- @return         (Node)   The newly spawned node.
+    --
+    local function spawnRoot( name, id )
+        local parentX, parentY = love.graphics.getDimensions();
+        return graph:addNode( id, parentX * 0.5, parentY * 0.5, true, nil, spritebatch, '' );
     end
 
     ---
@@ -63,17 +72,26 @@ function Graph.new(showLabels)
     -- @return     (Node)   The last node in the path.
     --
     local function createNodes( path )
-        local parentID = ROOT_FOLDER;
+        local parentID;
         for folder in path:gmatch('[^/]+') do
-            local nodeID = parentID .. '/' .. folder;
+            local nodeID;
+            if not parentID then
+                nodeID = folder;
+            else
+                nodeID = parentID .. '/' .. folder;
+            end
 
             if love.filesystem.isFile( nodeID ) then
                 local parentNode = graph:getNode( parentID );
                 parentNode:addFile( folder:match( '(.+)%.(.+)' ))
             elseif not graph:hasNode( nodeID ) then
                 local parentNode = graph:getNode( parentID );
-                spawnNode( folder, nodeID, parentNode, parentID );
-                graph:connectIDs( parentID, nodeID );
+                if not parentNode then
+                    spawnRoot( folder, nodeID )
+                else
+                    spawnNode( folder, nodeID, parentNode, parentID );
+                    graph:connectIDs( parentID, nodeID );
+                end
             end
             parentID = nodeID;
         end
