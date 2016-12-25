@@ -15,7 +15,7 @@ local MainScreen = {};
 -- Constants
 -- ------------------------------------------------
 
-local MOUNT_FOLDER = 'tmp';
+local MOUNT_FOLDER = '';
 
 local CAMERA_ROTATION_SPEED = 0.6;
 local CAMERA_TRANSLATION_SPEED = 400;
