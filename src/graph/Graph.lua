@@ -12,6 +12,8 @@ local Graph = {};
 -- ------------------------------------------------
 
 local ROOT_FOLDER  = '';
+local LABEL_FONT   = love.graphics.newFont( 25 );
+local DEFAULT_FONT = love.graphics.newFont( 12 );
 
 -- ------------------------------------------------
 -- Constructor
@@ -22,11 +24,11 @@ function Graph.new(showLabels)
 
     Graphoon.setNodeClass( Node );
 
-    local graph = Graphoon.new();
-    graph:addNode( ROOT_FOLDER, love.graphics.getWidth() * 0.5, love.graphics.getHeight() * 0.5, true );
-
     local sprite = love.graphics.newImage('res/img/file.png');
     local spritebatch = love.graphics.newSpriteBatch(sprite, 10000, 'stream');
+
+    local graph = Graphoon.new();
+    graph:addNode( ROOT_FOLDER, love.graphics.getWidth() * 0.5, love.graphics.getHeight() * 0.5, true, nil, spritebatch, ROOT_FOLDER );
 
     -- ------------------------------------------------
     -- Private Functions
@@ -103,9 +105,11 @@ function Graph.new(showLabels)
     --
     function self:draw( camrot, camscale )
         graph:draw( function( node )
-            if showLabels then
-                -- TODO Labels
-            end
+            love.graphics.setFont( LABEL_FONT );
+            love.graphics.setColor( 255, 255, 255, 105 );
+            love.graphics.print( node:getName(), node:getX(), node:getY(), -camrot, 1, 1, -node:getRadius(), -node:getRadius() );
+            love.graphics.setColor( 255, 255, 255, 255 );
+            love.graphics.setFont( DEFAULT_FONT );
         end,
         function( edge )
             love.graphics.setColor( 60, 60, 60, 255 );
