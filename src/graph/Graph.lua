@@ -42,11 +42,10 @@ function Graph.new(showLabels)
 
     ---
     -- Spawns a new node.
-    -- @param name     (string) The node's name based on the folder's name.
-    -- @param id       (string) The node's unqiue id based on the folder's full path.
-    -- @return         (Node)   The newly spawned node.
+    -- @param id (string) The node's unqiue id based on the folder's full path.
+    -- @return   (Node)   The newly spawned node.
     --
-    local function spawnRoot( name, id )
+    local function spawnRoot( id )
         local parentX, parentY = love.graphics.getDimensions();
         return graph:addNode( id, parentX * 0.5, parentY * 0.5, true, nil, spritebatch, '' );
     end
@@ -87,7 +86,7 @@ function Graph.new(showLabels)
             elseif not graph:hasNode( nodeID ) then
                 local parentNode = graph:getNode( parentID );
                 if not parentNode then
-                    spawnRoot( folder, nodeID )
+                    spawnRoot( nodeID )
                 else
                     spawnNode( folder, nodeID, parentNode, parentID );
                     graph:connectIDs( parentID, nodeID );
