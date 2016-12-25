@@ -177,8 +177,7 @@ function Node.new( id, x, y, anchor, parent, spritebatch, name )
 
     ---
     -- Adds a new file to the node.
-    -- When the file already exists its modifier is set to "addition" and it is
-    -- returned. When the file doesn't exist yet, its color and extension are
+    -- When the file doesn't exist yet, its color and extension are
     -- requested from the FileManager and a new File object is created. After
     -- the file object has been added to the file list of this node, the layout
     -- of the files around the nodes is recalculated.
@@ -187,13 +186,6 @@ function Node.new( id, x, y, anchor, parent, spritebatch, name )
     -- @return          (File)   The newly added File.
     --
     function self:addFile( fileName, extension )
-        print(fileName, extension)
-        -- Exit early if the file already exists.
-        if files[fileName] then
-            files[fileName]:setState( 'add' );
-            return files[fileName];
-        end
-
         -- Get the file color and extension from the FileManager and create the actual file object.
         local color = FileManager.add( extension );
         files[fileName] = File.new( self:getX(), self:getY(), color, extension );
