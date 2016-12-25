@@ -181,19 +181,19 @@ function Node.new( id, x, y, anchor, parent, spritebatch, name )
     -- requested from the FileManager and a new File object is created. After
     -- the file object has been added to the file list of this node, the layout
     -- of the files around the nodes is recalculated.
-    -- @param fileName  (string) The name of the file to add.
-    -- @param extension (string) The extension of the file to add.
-    -- @return          (File)   The newly added File.
+    -- @param file (string) The name of the file to add.
+    -- @return     (File)   The newly added File.
     --
-    function self:addFile( fileName, extension )
+    function self:addFile( file )
+        local extension = file:match( '%.(.+)' ) or '.?';
+
         -- Get the file color and extension from the FileManager and create the actual file object.
         local color = FileManager.add( extension );
-        files[fileName] = File.new( self:getX(), self:getY(), color, extension );
+        files[file] = File.new( self:getX(), self:getY(), color, extension );
         fileCount = fileCount + 1;
 
         -- Update layout of the files.
         radius = plotCircle( fileCount );
-        return files[fileName];
     end
 
     ---

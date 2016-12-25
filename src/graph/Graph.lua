@@ -82,7 +82,7 @@ function Graph.new(showLabels)
 
             if love.filesystem.isFile( nodeID ) then
                 local parentNode = graph:getNode( parentID );
-                parentNode:addFile( folder:match( '(.+)%.(.+)' ))
+                parentNode:addFile( folder )
             elseif not graph:hasNode( nodeID ) then
                 local parentNode = graph:getNode( parentID );
                 if not parentNode then
