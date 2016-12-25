@@ -4,7 +4,7 @@ local GAME_IDENTITY = "rmcode_LoFiVi";
 
 local GAME_VERSION = "0159";
 
-local LOVE_VERSION = "0.10.0";
+local LOVE_VERSION = "0.10.2";
 
 -- ------------------------------------------------
 -- Global Functions
