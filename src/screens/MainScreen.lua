@@ -126,10 +126,13 @@ function MainScreen.new()
     ---
     -- Creates the panel containing the sorted list of file extensions.
     --
-    local function createFilePanel(pvisible)
-        local newfilePanel = FilePanel.new();
-        newfilePanel:setFiles( FileManager.getSortedList() );
-        newfilePanel:setVisible(pvisible);
+    local function createFilePanel( pvisible )
+        local newfilePanel = FilePanel.new( pvisible or true, 0, 0, 150, love.graphics.getHeight() - 40 );
+
+        newfilePanel:setTotalFiles( FileManager.getTotalFiles() );
+        newfilePanel:setSortedList( FileManager.getSortedList() );
+        newfilePanel:setVisible( pvisible );
+
         return newfilePanel;
     end
 
@@ -207,7 +210,7 @@ function MainScreen.new()
     local function resetGraph()
         FileManager.reset();
         graph = createGraph();
-        -- filePanel = createFilePanel(filePanel:isVisible());
+        filePanel = createFilePanel( filePanel:isVisible() );
     end
 
     -- ------------------------------------------------
