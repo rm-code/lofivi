@@ -18,7 +18,7 @@ local DEFAULT_FONT = love.graphics.newFont( 12 );
 -- Constructor
 -- ------------------------------------------------
 
-function Graph.new(showLabels)
+function Graph.new( showLabels )
     local self = {};
 
     Graphoon.setNodeClass( Node );
@@ -122,6 +122,9 @@ function Graph.new(showLabels)
     --
     function self:draw( camrot, camscale )
         graph:draw( function( node )
+            if not showLabels then
+                return
+            end
             love.graphics.setFont( LABEL_FONT );
             love.graphics.setColor( 255, 255, 255, 105 );
             love.graphics.print( node:getName(), node:getX(), node:getY(), -camrot, 1 / camscale, 1 / camscale, -node:getRadius() * camscale, -node:getRadius() * camscale );
